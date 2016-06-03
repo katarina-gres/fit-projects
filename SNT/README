@@ -1,0 +1,6 @@
+
+README k projektu do predmetu SNT, Vojtech Havlena
+Struktura projektu:
+ input/ -- par testovacich vstupu (nebyly pridany vsechny soubory kvuli velikosti, instance RCPSP jsou ke stazeni na http://www.om-db.wi.tum.de/psplib/getdata.cgi?mode=sm)
+ doc/ -- Dokumentace k projektu
+ src/ -- Zdrojove kody projektu v jazyce Python
