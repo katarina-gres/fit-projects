@@ -1,0 +1,723 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+\usepackage[IL2]{fontenc}
+\usepackage[left=3cm,text={15cm, 23cm},top=3.5cm]{geometry}
+
+\usepackage{graphicx}
+\usepackage{tikz}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{forest}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{textcomp}
+
+\usepackage{enumitem}
+%\usepackage[neverdecrease]{paralist}
+
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
+
+\newcounter{counten}
+\setcounter{counten}{1}
+
+\title{Úkol č. 1 do předmětu Teoretická informatika}
+\author{Vojtěch Havlena (xhavle03)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\setlist[enumerate,1]{leftmargin=0.2cm}
+
+\begin{enumerate}[label=\textbf{\arabic*}.]
+ \item {\bfseries Příklad}
+  \begin{enumerate}
+    \item Gramatika $G_1$ je čtveřice $G_1 = (N, \Sigma, P, S)$, kde 
+    \begin{itemize}
+     \item[--] $N = \{S, A, B, D\}$ je konečná množina neterminálních symbolů,
+     \item[--] $\Sigma = \{a, b, c, d\}$ je konečná množina terminálních symbolů,
+     \item[--] $P = \{S \rightarrow AD, A \rightarrow aAc, A \rightarrow B, B \rightarrow bB, B \rightarrow \varepsilon, D \rightarrow dD, D \rightarrow \varepsilon \}$ je konečná množina přepisovacích pravidel a
+     \item[--] $S\in N$ je výchozí symbol gramatiky $G_1$.
+    \end{itemize}
+    \item Gramatika $G_1$ je typu 2 (není typu 3, protože obsahuje pravidlo se dvěma neterminálními symboly na pravé straně). Jazyk $L_1$ je jazyk typu 2 (bezkontextový jazyk). Jazyk 
+      $L_1$ není jazyk typu 3, protože neexistuje konečný automat, který by jej přijímal. Tyto typy se mohou obecně lišit, protože gramatika daného typu $T$ 
+      může generovat jazyky typu $T$ a vyšších (za jazyk nejvyššího typu považuji jazyk $\mathcal{L}_3$). Např. gramatika typu 0 může generovat jazyky typu 1. Toto plyne z faktu, že 
+      $\mathcal{L}_0 \subseteq \mathcal{L}_1 \subseteq \mathcal{L}_2 \subseteq \mathcal{L}_3$.
+  \end{enumerate}
+ \item {\bfseries Příklad}
+  {\bfseries Část (a)}: 
+  \begin{enumerate}
+   \item Rozklad regulárního výrazu $r_2$ si vyjádříme stromem.\\
+   \enlargethispage{2em}
+   \begin{center}
+   \begin{forest}
+    [$r_2$ [$r_3$ [$r_4$ [$r_5$ [(] [$r_6$ [$r_7$ [$r_8$ [a]] [.] [$r_{9}$ [b]]] [.] [$r_{10}$ [c]]] [)]] [*]] [.] [$r_{11}$ [(][$r_{12}$ [$r_{13}$ [a]] [+] [$r_{14}$ [$\varepsilon$]]][)]]] [.] [$r_{15}$ [$r_{16}$ [(] [$r_{17}$ [$r_{18}$ [$r_{19}$ [a]] [.] [$r_{20}$ [b]]] [.] [$r_{21}$ [c]]] [)]] [*]]]
+   \end{forest}
+   \end{center}
+   \item Převod stromu reprezentujícího regulární výraz $r_2$ na konečný automat.
+   \begin{enumerate}
+    \item Regulárnímu výrazu $r_8 = a$ odpovídá automat $N_1$:
+    \begin{center}
+    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+			semithick]
+      \tikzstyle{every state}=[text=black]
+
+      \node[state,initial,initial text={}] (A)             {1};
+      \node[state,accepting]         (B) [right of=A] {2};
+
+      \path (A) edge              node {a} (B);
+    \end{tikzpicture}
+   \end{center}
+   
+    \item Regulárnímu výrazu $r_9 = b$ odpovídá automat $N_2$:
+      \begin{center}
+      \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+			  semithick]
+	\tikzstyle{every state}=[text=black]
+
+	\node[state,initial,initial text={}] (A)             {2};
+	\node[state,accepting]         (B) [right of=A] {3};
+
+	\path (A) edge              node {b} (B);
+      \end{tikzpicture}
+      \end{center}
+    \item Regulárnímu výrazu $r_7 = r_8r_9 = ab$ odpovídá automat $N_3$:
+      \begin{center}
+      \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+			  semithick]
+	\tikzstyle{every state}=[text=black]
+
+	\node[state,initial,initial text={}] (A)             {1};
+	\node[state]         (B) [right of=A] {2};
+	\node[state,accepting]         (C) [right of=B] {3};
+
+	\path (A) edge              node {a} (B)
+	      (B) edge              node {b} (C);
+      \end{tikzpicture}
+      \end{center}
+      
+    \item Regulárnímu výrazu $r_{10} = c$ odpovídá automat $N_4$:
+      \begin{center}
+      \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+			  semithick]
+	\tikzstyle{every state}=[text=black]
+
+	\node[state,initial,initial text={}] (A)             {3};
+	\node[state,accepting]         (B) [right of=A] {4};
+
+	\path (A) edge              node {c} (B);
+      \end{tikzpicture}
+      \end{center}
+    \item Regulárnímu výrazu $r_6 = r_7r_{10} = abc$ odpovídá automat $N_5$:
+      \begin{center}
+      \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+			  semithick]
+	\tikzstyle{every state}=[text=black]
+
+	\node[state,initial,initial text={}] (A)             {1};
+	\node[state]         (B) [right of=A] {2};
+	\node[state]         (C) [right of=B] {3};
+	\node[state,accepting]         (D) [right of=C] {4};
+
+	\path (A) edge              node {a} (B)
+	      (B) edge              node {b} (C)
+	      (C) edge              node {c} (D);
+      \end{tikzpicture}
+      \end{center}
+    \item Automat pro regulární výraz $r_5 = (r_{6})$ je stejný jako automat $N_5$. Zkonstruujeme tedy rovnou automat $N_6$ pro výraz $r_4 = r_5^* = (abc)^*$.
+      \begin{center}
+      \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2cm,
+			  semithick]
+	\tikzstyle{every state}=[text=black]
+
+	\node[state,initial,initial text={}] (A)             {0};
+	\node[state]         (B) [right of=A] {1};
+	\node[state]         (C) [right of=B] {2};
+	\node[state]         (D) [right of=C] {3};
+	\node[state]         (E) [right of=D] {4};
+	\node[state,accepting]         (F) [right of=E] {5};
+	
+	\path (A) edge              node {$\varepsilon$} (B)
+	      (B) edge              node {a} (C)
+	      (C) edge              node {b} (D)
+	      (D) edge              node {c} (E)
+	      (E) edge              node {$\varepsilon$} (F)
+	      (A) edge  [bend right=25,below]             node {$\varepsilon$} (F)
+	      (E) edge  [bend right=40,above]             node {$\varepsilon$} (B);
+      \end{tikzpicture}
+      \end{center}
+    \item Regulárnímu výrazu $r_{13} = a$ odpovídá automat $N_7$:
+      \begin{center}
+      \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+			  semithick]
+	\tikzstyle{every state}=[text=black]
+
+	\node[state,initial,initial text={}] (A)             {6};
+	\node[state,accepting]         (B) [right of=A] {7};
+
+	\path (A) edge              node {a} (B);
+      \end{tikzpicture}
+      \end{center}
+      
+    \item Regulárnímu výrazu $r_{14} = \varepsilon$ odpovídá automat $N_8$:
+      \begin{center}
+      \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+			  semithick]
+	\tikzstyle{every state}=[text=black]
+
+	\node[state,initial,initial text={}] (A)             {8};
+	\node[state,accepting]         (B) [right of=A] {9};
+
+	\path (A) edge              node {$\varepsilon$} (B);
+      \end{tikzpicture}
+      \end{center}
+      
+    \item Regulárnímu výrazu $r_{12} = r_{13}+r_{14} = a + \varepsilon$ odpovídá automat $N_9$:
+      \begin{center}
+      \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.5cm,
+			  semithick]
+	\tikzstyle{every state}=[text=black]
+
+	\node[state,initial,initial text={}] (A)             {5};
+	\node[state]         (B) [right of=A, above of=A] {6};
+	\node[state]         (C) [node distance=2.5cm, right of=B] {7};
+	\node[state,accepting]         (D) [right of=B, below of=C] {10};
+	\node[state]         (E) [right of=A, below of=A] {8};
+	\node[state]         (F) [node distance=2.5cm,right of=E] {9};
+
+	\path (A) edge              node {$\varepsilon$} (B)
+	      (B) edge              node {a} (C)
+	      (C) edge              node {$\varepsilon$} (D)
+	      (A) edge              node {$\varepsilon$} (E)
+	      (E) edge              node {$\varepsilon$} (F)
+	      (F) edge              node {$\varepsilon$} (D);
+      \end{tikzpicture}
+      \end{center}
+      
+      
+     \item Automat pro regulární výraz $r_{11} = (r_{12})$ je stejný jako automat $N_9$. Zkonstruujeme tedy rovnou automat $N_{10}$ pro výraz $r_4 = r_4r_{11} = (abc)^*(a+\varepsilon)$.
+     
+   \end{enumerate}
+
+    \begin{center}
+      \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.5cm,
+			  semithick]
+	\tikzstyle{every state}=[text=black]
+
+	\node[state,initial,initial text={}] (A)             {0};
+	\node[state]         (B) [right of=A] {1};
+	\node[state]         (C) [right of=B] {2};
+	\node[state]         (D) [right of=C] {3};
+	\node[state]         (E) [right of=D] {4};
+	\node[state]         (F) [right of=E] {5};
+	\node[state]         (G) [right of=F, above of=F] {6};
+	\node[state]         (H) [right of=G] {7};
+	\node[state,accepting]         (I) [right of=G, below of=H] {10};
+	\node[state]         (J) [right of=F, below of=F] {8};
+	\node[state]         (K) [right of=J] {9};
+
+	\path (F) edge              node {$\varepsilon$} (G)
+	      (G) edge              node {a} (H)
+	      (H) edge              node {$\varepsilon$} (I)
+	      (F) edge              node {$\varepsilon$} (J)
+	      (J) edge              node {$\varepsilon$} (K)
+	      (K) edge              node {$\varepsilon$} (I);
+	\path (A) edge              node {$\varepsilon$} (B)
+	      (B) edge              node {a} (C)
+	      (C) edge              node {b} (D)
+	      (D) edge              node {c} (E)
+	      (E) edge              node {$\varepsilon$} (F)
+	      (A) edge  [bend right=35,below]             node {$\varepsilon$} (F)
+	      (E) edge  [bend right=40,above]             node {$\varepsilon$} (B);
+      \end{tikzpicture}
+      \end{center}
+   \begin{enumerate}
+    \setcounter{enumiii}{10}
+    \item Automat pro regulární výraz $r_{15} = (abc)^*$ je ekvivalentní automatu $N_6$. Uděláme tedy rovnou automat $N_{11}$ pro výraz $r_2 = r_3r_{15}$.
+   \end{enumerate}
+
+   \begin{center}
+      \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.5cm,
+			  semithick]
+	\tikzstyle{every state}=[text=black]
+
+	\node[state,initial,initial text={}] (A)             {0};
+	\node[state]         (B) [right of=A] {1};
+	\node[state]         (C) [right of=B] {2};
+	\node[state]         (D) [right of=C] {3};
+	\node[state]         (E) [right of=D] {4};
+	\node[state]         (F) [right of=E] {5};
+	\node[state]         (G) [right of=F, above of=F] {6};
+	\node[state]         (H) [right of=G] {7};
+	\node[state]         (I) [right of=G, below of=H] {10};
+	\node[state]         (J) [right of=F, below of=F] {8};
+	\node[state]         (K) [right of=J] {9};
+	
+	\node[state]         (L) [node distance=5cm, below of=A, right of=A] {11};
+	\node[state]         (M) [right of=L] {12};
+	\node[state]         (N) [right of=M] {13};
+	\node[state]         (O) [right of=N] {14};
+	\node[state,accepting]         (P) [right of=O] {15};
+
+	\path (F) edge              node {$\varepsilon$} (G)
+	      (G) edge              node {a} (H)
+	      (H) edge              node {$\varepsilon$} (I)
+	      (F) edge              node {$\varepsilon$} (J)
+	      (J) edge              node {$\varepsilon$} (K)
+	      (K) edge              node {$\varepsilon$} (I);
+	\path (A) edge              node {$\varepsilon$} (B)
+	      (B) edge              node {a} (C)
+	      (C) edge              node {b} (D)
+	      (D) edge              node {c} (E)
+	      (E) edge              node {$\varepsilon$} (F)
+	      (A) edge  [bend right=35,below]             node {$\varepsilon$} (F)
+	      (E) edge  [bend right=40,above]             node {$\varepsilon$} (B);
+	\path (I) edge  [in=60,out=-70,below]            node {$\varepsilon$} (L)
+	      (L) edge              node {a} (M)
+	      (M) edge              node {b} (N)
+	      (N) edge              node {c} (O)
+	      (O) edge              node {$\varepsilon$} (P)
+	      (I) edge  [in=60,out=-30,above]            node {$\varepsilon$} (P)
+	      (O) edge  [bend left=50,below]            node {$\varepsilon$} (L);
+      \end{tikzpicture}
+      \end{center}
+  
+  \item Převod RKA $N_{11}$ na DKA $M_1$ pomocí algoritmu 3.6 z opory k předmětu TIN. Přechodová funkce 
+    DKA $M_1$ je označena jako $\delta'$.
+  \begin{itemize}
+   \item[--] Počáteční stav $A$ je $A = \varepsilon$-uzávěr$(\{0\}) = \{0,1,5,6,8,9,10,11,15\}$
+   \item[--] $\delta'(A,a) = \varepsilon$-uzávěr$(\{2,7,12\}) = \{2,7,10,11,12,15\} = B$
+   \item[--] $\delta'(A,b) = \varepsilon$-uzávěr$(\emptyset) = C$
+   \item[--] $\delta'(A,c) = \varepsilon$-uzávěr$(\emptyset) = C$
+   \item[--] $\delta'(B,a) = \varepsilon$-uzávěr$(\{12\}) = \{12\} = D$
+   \item[--] $\delta'(B,b) = \varepsilon$-uzávěr$(\{3,13\}) = \{3,13\} = E$
+   \item[--] $\delta'(B,c) = \varepsilon$-uzávěr$(\emptyset) = C$
+   \item[--] $\delta'(C,a) = \varepsilon$-uzávěr$(\emptyset) = C$
+   \item[--] $\delta'(C,b) = \varepsilon$-uzávěr$(\emptyset) = C$
+   \item[--] $\delta'(C,c) = \varepsilon$-uzávěr$(\emptyset) = C$
+   \item[--] $\delta'(D,a) = \varepsilon$-uzávěr$(\emptyset) = C$
+   \item[--] $\delta'(D,b) = \varepsilon$-uzávěr$(\{13\}) = \{13\} = F$
+   \item[--] $\delta'(D,c) = \varepsilon$-uzávěr$(\emptyset) = C$
+   
+   \item[--] $\delta'(E,a) = \varepsilon$-uzávěr$(\emptyset) = C$
+   \item[--] $\delta'(E,b) = \varepsilon$-uzávěr$(\emptyset) = C$
+   \item[--] $\delta'(E,c) = \varepsilon$-uzávěr$(\{4,14\}) = \{1,4,5,6,8,9,10,11,14,15\} = G$
+   
+   \item[--] $\delta'(F,a) = \varepsilon$-uzávěr$(\emptyset) = C$
+   \item[--] $\delta'(F,b) = \varepsilon$-uzávěr$(\emptyset) = C$
+   \item[--] $\delta'(F,c) = \varepsilon$-uzávěr$(\{14\}) = \{11,14,15\} = H$
+   
+   \item[--] $\delta'(G,a) = \varepsilon$-uzávěr$(\{2,7,12\}) = \{2,7,10,11,12,15\} = B$
+   \item[--] $\delta'(G,b) = \varepsilon$-uzávěr$(\emptyset) = C$
+   \item[--] $\delta'(G,c) = \varepsilon$-uzávěr$(\emptyset) = C$
+   
+   \item[--] $\delta'(H,a) = \varepsilon$-uzávěr$(\{12\}) = \{12\} = D$
+   \item[--] $\delta'(H,b) = \varepsilon$-uzávěr$(\emptyset) = C$
+   \item[--] $\delta'(H,c) = \varepsilon$-uzávěr$(\emptyset) = C$
+   \item[--] Množina koncových stavů $F = \{A,B,G,H\}$
+  \end{itemize}
+  Grafické znozornění DKA $M_1$:
+  \begin{center}
+    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=1.8cm,
+			semithick]
+      \tikzstyle{every state}=[text=black]
+
+      \node[state,initial,accepting,initial text={}] (A)             {A};
+      
+      \node[state]         (F) [right of=A,node distance=5cm] {F};
+      \node[state]         (D) [above of=F] {D};      
+      \node[state,accepting]         (B) [above of=D] {B};
+      \node[state,accepting]         (H) [below of=F] {H};
+      \node[state]         (C) [below of=H,left of=H] {C};
+      
+      \node[state]         (E) [right of=D,node distance=5cm] {E};
+      \node[state,accepting]         (G) [right of=H,node distance=2.5cm] {G};
+
+      \path (A) edge [bend left,in=140]            node {a} (B)
+	    (A) edge [bend right,in=230,above]            node {b,c} (C)
+	    (B) edge [bend left]             node {b} (E)
+	    (B) edge [bend left]             node {a} (D)
+	    (B) edge [bend right,out=-60,in=-100]            node {c} (C)
+	    (D) edge [bend left]             node {b} (F)
+	    (D) edge [bend right=50]            node {a,c} (C)
+	    (E) edge [bend left,above]            node {c} (G)
+	    (E) edge [bend left=60]            node {a,b} (C)
+	    (F) edge [bend left]             node {c} (H)
+	    (F) edge [bend right]             node {a,b} (C)
+	    (G) edge [bend right]             node {a} (B)
+	    (G) edge [bend left,above]             node {b,c} (C)
+	    (H) edge [bend right=80]             node {a} (D)
+	    (H) edge [bend left,above]             node {b,c} (C)
+	    (C) edge [loop below]             node {a,b,c} (C);
+      
+    \end{tikzpicture}
+   \end{center}
+   \item Převod DKA $M_1$ na odpovídající redukovaný DKA $M_2$. Pro převod je 
+    použit algoritmus 3.5 z opory k předmětu TIN.
+    \begin{itemize}
+     \item[--] Automat $M_1$ neobsahuje žádné nedosažitelné stavy.
+     \item[--] Automat $M_1$ je již úplný.
+     \item[--] Můžeme tedy provést přímo převod na redukovaný KA.
+    \end{itemize}
+    \begin{minipage}{.5\linewidth}
+    \begin{tabular}{|c|r||c|c|c|}
+    \hline
+      &$\stackrel{0}{\equiv}$ & a & b & c \\ \hline \hline
+      \multirow{4}{*}{\textlbrackdbl}&I: A & B(I) & C(II) & C(II) \\ [0.2em]
+      &B & D(II) & E(II) & C(II) \\[0.2em]
+      &G & B(I) & C(II) & C(II) \\[0.2em]
+      &H & D(I) & C(II) & C(II) \\[0.2em] \hline
+      &II: C & C(II) & C(II) & C(II) \\[0.2em]
+      &E & C(II) & C(II) & G(I) \\[0.2em]
+      &D & C(II) & F(II) & C(II) \\[0.2em]
+      &F & C(II) & C(II) & H(I) \\ \hline
+    \end{tabular}
+    \end{minipage}%
+    \begin{minipage}{.5\linewidth}
+    \begin{tabular}{|c|r||c|c|c|}
+    \hline
+      &$\stackrel{1}{\equiv}$ & a & b & c \\ \hline \hline
+      \multirow{2}{*}{\textlbrackdbl}&I: A & B(II) & C(III) & C(III) \\[0.2em]
+      &G & B(II) & C(III) & C(III) \\[0.2em] \hline
+      \multirow{2}{*}{\textlbrackdbl}&II: B & D(III) & E(IV) & C(III) \\[0.2em]
+      &H & D(III) & C(III) & C(III) \\[0.2em] \hline
+      &III: C & C(III) & C(III) & C(III) \\[0.2em]
+      &D & C(III) & F(IV) & C(III) \\ [0.2em]\hline
+      &IV: E & C(III) & C(III) & G(I) \\ [0.2em]
+      &F & C(III) & C(III) & H(II) \\[0.2em] \hline
+    \end{tabular}
+    \end{minipage}
+    
+    \vspace*{2em}
+    \begin{tabular}{|c|r||c|c|c|}
+    \hline
+      & $\stackrel{2}{\equiv}$ & a & b & c \\ \hline \hline
+      \multirow{2}{*}{\textlbrackdbl} & I: A & B(II) & C(IV) & C(IV) \\[0.2em]
+      & G & B(II) & C(IV) & C(IV) \\[0.2em] \hline
+      \textlbrackdbl&II: B & D(V) & E(VI) & C(IV) \\[0.2em]\hline
+      \textlbrackdbl&III: H & D(V) & C(IV) & C(IV) \\[0.2em] \hline
+      &IV: C & C(IV) & C(IV) & C(IV) \\[0.2em] \hline
+      &V: D & C(IV) & F(VII) & C(IV) \\[0.2em] \hline
+      &VI: E & C(IV) & C(IV) & G(I) \\[0.2em] \hline
+      &VII: F & C(IV) & C(IV) & H(III) \\[0.2em] \hline
+    \end{tabular}
+    \vspace*{1em}
+    \begin{itemize}
+     \item[--] Počáteční stav automatu: I.
+    \end{itemize}
+  \end{enumerate}
+  \enlargethispage{2em}
+   Grafické znozornění výsledného redukovaného DKA $M_2$:
+  \begin{center}
+    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.5cm,
+			semithick]
+      \tikzstyle{every state}=[text=black]
+
+      %\node[state,initial,accepting,initial text={}] (A)             {A};
+      
+      \node[state,accepting]         (B)  {II};
+      \node[state]         (D) [right of=B] {V};   
+      \node[state]         (F) [right of=D] {VII};
+         
+      
+      \node[state,accepting]         (H) [right of=F] {III};
+      \node[state]         (C) [right of=H] {IV};
+      
+      \node[state]         (E) [above of=H,node distance=1.8cm] {VI};
+      \node[state,accepting,initial,initial text={}]         (G) [above of=D,node distance=3cm] {I};
+
+      \path %(A) edge [bend left,in=140]            node {a} (B)
+	    %(A) edge [bend right,in=230,above]            node {b,c} (C)
+	    (B) edge [bend left]             node {b} (E)
+	    (B) edge [bend left]             node {a} (D)
+	    (B) edge [bend right,out=-40,in=-120]            node {c} (C)
+	    (D) edge [bend left]             node {b} (F)
+	    (D) edge [bend right=50]            node {a,c} (C)
+	    (E) edge [bend right,below]            node {c} (G)
+	    (E) edge [bend left,above]            node {a,b} (C)
+	    (F) edge [bend left]             node {c} (H)
+	    (F) edge [bend right,below]             node {a,b} (C)
+	    (G) edge [bend right]             node {a} (B)
+	    (G) edge [bend left,in=120,out=50,below]             node {b,c} (C)
+	    (H) edge [bend right=50,above]             node {a} (D)
+	    (H) edge [bend left,above]             node {b,c} (C)
+	    (C) edge [loop below]             node {a,b,c} (C);
+      
+    \end{tikzpicture}
+   \end{center}
+  {\bfseries Část (b)}: Počet tříd ekvivalence relace $\sim_L$ pro jazyk $L(M_2)$ odpovídá počtu stavů redukovaného DKA $M_2$.
+  Celkem je tedy 7 tříd ekvivalence.
+  \begin{enumerate}
+   \item Ekvivalenční třída $L^{-1}(I)$:
+    \begin{center}
+    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+			semithick]
+      \tikzstyle{every state}=[text=black]
+
+      \node[state,initial,initial text={},accepting] (A)             {I};
+      \node[state]         (B) [right of=A] {II};
+      \node[state]         (C) [right of=B] {VI};
+
+      \path (A) edge              node {a} (B)
+	    (B) edge node {b} (C)
+	    (C) edge [bend right = 30,above] node {c} (A);
+    \end{tikzpicture}
+   \end{center}
+   
+   \item Ekvivalenční třída $L^{-1}(II)$:
+    \begin{center}
+    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+			semithick]
+      \tikzstyle{every state}=[text=black]
+
+      \node[state,initial,initial text={}] (A)             {I};
+      \node[state,accepting]         (B) [right of=A] {II};
+      \node[state]         (C) [right of=B] {VI};
+
+      \path (A) edge              node {a} (B)
+	    (B) edge node {b} (C)
+	    (C) edge [bend right = 30,above] node {c} (A);
+    \end{tikzpicture}
+   \end{center}
+   
+   \item Ekvivalenční třída $L^{-1}(III)$:
+    \begin{center}
+    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.4cm,
+			semithick]
+      \tikzstyle{every state}=[text=black]
+
+      \node[state,initial,initial text={}] (A)             {I};
+      \node[state]         (B) [right of=A] {II};
+      \node[state]         (C) [right of=B] {VI};
+      \node[state]         (D) [right of=C] {V};
+      \node[state]         (E) [right of=D] {VII};
+      \node[state,accepting]         (F) [right of=E] {III};
+
+      \path (A) edge              node {a} (B)
+	    (B) edge node {b} (C)
+	    (C) edge [bend right = 40,above] node {c} (A)
+	    (B) edge [bend right = 40,below] node {a} (D)
+	    (D) edge node {b} (E)
+	    (E) edge node {c} (F)
+	    (F) edge [bend right = 40,above] node {a} (D);
+    \end{tikzpicture}
+   \end{center}
+   
+    \item Ekvivalenční třída $L^{-1}(IV)$:
+    \begin{center}
+    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.5cm,
+			semithick]
+      \tikzstyle{every state}=[text=black]
+
+      %\node[state,initial,accepting,initial text={}] (A)             {A};
+      
+      \node[state]         (B)  {II};
+      \node[state]         (D) [right of=B] {V};   
+      \node[state]         (F) [right of=D] {VII};
+         
+      
+      \node[state]         (H) [right of=F] {III};
+      \node[state, accepting]         (C) [right of=H] {IV};
+      
+      \node[state]         (E) [above of=H,node distance=1.8cm] {VI};
+      \node[state,initial,initial text={}]         (G) [above of=D,node distance=3cm] {I};
+
+      \path %(A) edge [bend left,in=140]            node {a} (B)
+	    %(A) edge [bend right,in=230,above]            node {b,c} (C)
+	    (B) edge [bend left]             node {b} (E)
+	    (B) edge [bend left]             node {a} (D)
+	    (B) edge [bend right,out=-40,in=-120]            node {c} (C)
+	    (D) edge [bend left]             node {b} (F)
+	    (D) edge [bend right=50]            node {a,c} (C)
+	    (E) edge [bend right,below]            node {c} (G)
+	    (E) edge [bend left,above]            node {a,b} (C)
+	    (F) edge [bend left]             node {c} (H)
+	    (F) edge [bend right,below]             node {a,b} (C)
+	    (G) edge [bend right]             node {a} (B)
+	    (G) edge [bend left,in=120,out=50,below]             node {b,c} (C)
+	    (H) edge [bend right=50,above]             node {a} (D)
+	    (H) edge [bend left,above]             node {b,c} (C)
+	    (C) edge [loop below]             node {a,b,c} (C);
+      
+    \end{tikzpicture}
+   \end{center}
+   
+    \item Ekvivalenční třída $L^{-1}(V)$:
+    \begin{center}
+    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.4cm,
+			semithick]
+      \tikzstyle{every state}=[text=black]
+
+      \node[state,initial,initial text={}] (A)             {I};
+      \node[state]         (B) [right of=A] {II};
+      \node[state]         (C) [right of=B] {VI};
+      \node[state,accepting]         (D) [right of=C] {V};
+      \node[state]         (E) [right of=D] {VII};
+      \node[state]         (F) [right of=E] {III};
+
+      \path (A) edge              node {a} (B)
+	    (B) edge node {b} (C)
+	    (C) edge [bend right = 40,above] node {c} (A)
+	    (B) edge [bend right = 40,below] node {a} (D)
+	    (D) edge node {b} (E)
+	    (E) edge node {c} (F)
+	    (F) edge [bend right = 40,above] node {a} (D);
+    \end{tikzpicture}
+   \end{center}
+   
+   \item Ekvivalenční třída $L^{-1}(VI)$:
+   \begin{center}
+    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+			semithick]
+      \tikzstyle{every state}=[text=black]
+
+      \node[state,initial,initial text={}] (A)             {I};
+      \node[state]         (B) [right of=A] {II};
+      \node[state,accepting]         (C) [right of=B] {VI};
+
+      \path (A) edge              node {a} (B)
+	    (B) edge node {b} (C)
+	    (C) edge [bend right = 30,above] node {c} (A);
+    \end{tikzpicture}
+   \end{center}
+   
+   \item Ekvivalenční třída $L^{-1}(VII)$:
+    \begin{center}
+    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.4cm,
+			semithick]
+      \tikzstyle{every state}=[text=black]
+
+      \node[state,initial,initial text={}] (A)             {I};
+      \node[state]         (B) [right of=A] {II};
+      \node[state]         (C) [right of=B] {VI};
+      \node[state]         (D) [right of=C] {V};
+      \node[state,accepting]         (E) [right of=D] {VII};
+      \node[state]         (F) [right of=E] {III};
+
+      \path (A) edge              node {a} (B)
+	    (B) edge node {b} (C)
+	    (C) edge [bend right = 40,above] node {c} (A)
+	    (B) edge [bend right = 40,below] node {a} (D)
+	    (D) edge node {b} (E)
+	    (E) edge node {c} (F)
+	    (F) edge [bend right = 40,above] node {a} (D);
+    \end{tikzpicture}
+   \end{center}
+   
+  \end{enumerate}
+
+ \item {\bfseries Příklad}
+  \begin{center}
+    \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.8cm,
+			semithick]
+      \tikzstyle{every state}=[text=black]
+
+      \node[state,initial,initial text={}] (A)             {$X_1$};
+      \node[state]         (B) [right of=A] {$X_2$};
+      \node[state,accepting]         (C) [right of=B] {$X_3$};
+
+      \path (A) edge              node {a} (B)
+	    (B) edge [loop above] node {c} (B)
+	    (B) edge [bend left] node {c} (A)
+	    (B) edge node {b} (C)
+	    (C) edge [bend right=50,above] node [align=top] {a} (B)
+	    (C) edge [bend left = 50] node {b} (A);
+    \end{tikzpicture}
+   \end{center}
+   Soustava rovnic pro konečný automat $M_3$:
+   \begin{eqnarray}
+      X_1 &=& aX_2 \\
+      X_2 &=& cX_1 + cX_2 + bX_3\\
+      X_3 &=& \varepsilon + bX_1 + aX_2
+   \end{eqnarray}
+   Řešení soustavy rovnic:
+   Výraz pro $X_1$ dosadíme z (1) do (2) a z (1) do (3) a dostaneme soustavu
+   \begin{eqnarray}
+    X_2 &=& caX_2 + cX_2 + bX_3 \\
+    X_3 &=& \varepsilon + baX_2 + aX_2
+   \end{eqnarray}
+   Výraz $X_3$ dosadíme z (5) do (4) a dostaneme rovnici
+   \begin{equation}
+     X_2 = caX_2 + cX_2 + b(\varepsilon + baX_2 + aX_2)
+   \end{equation}
+   Vzhledem k tomu, že operace $\cdot$ a $+$ jsou distributivní, z rovnice (6) dostáváme
+   \begin{equation}
+     X_2 = caX_2 + cX_2 + b\varepsilon + bbaX_2 + baX_2
+   \end{equation}
+   S využitím identity $\varepsilon$ a po částečném vytknutí $X_2$ získáme tvar
+   \begin{equation}
+     X_2 = (ca + c + bba + ba)X_2 + b
+   \end{equation}
+   Podle věty 3.14 (opora k předmětu TIN) je řešení rovnice (8) dáno následujícím předpisem
+   \begin{equation}
+     X_2 = (ca + c + bba + ba)^*b
+   \end{equation}
+   Abychom získali regulární výraz, který je ekvivalentní automatu $M_3$, musíme vyjádřit výraz $X_1$.
+   \begin{equation}
+     X_1 = aX_2 = a(ca + c + bba + ba)^*b
+   \end{equation}
+   Ekvivalentní regulární výraz k automatu $M_3$ je tedy $a(ca + c + bba + ba)^*b$.
+   
+ \item {\bfseries Příklad}
+   \begin{itemize}
+     \item[--] Vstup algoritmu: Dva konečné automaty $M_1 = (Q_1, \Sigma_1, \delta_1, q_1^0, F_1)$ a $M_2 = (Q_2, \Sigma_2, \delta_2, q_2^0, F_2)$.
+     \item[--] Výstup: Konečný automat $M_{restrict}$ takový, že $L(M_{restrict}) = restrict(L(M_1), L(M_2))$, při čemž operace $restrict$ je dána následovně 
+      $$ restrict(L_1, L_2) = \{ w | w\in L_1 \wedge \exists w'\in L_2: |w| = |w'| \}. $$
+     \item[--] Metoda:\\
+     KA $M_{restrict} = (Q_3, \Sigma_3, \delta_3, q_3^0, F_3)$ je zkonstruován následovně:
+     \begin{itemize}
+      \item[$\circ$] Množina stavů $Q_3 = Q_1\times Q_2$
+      \item[$\circ$] Vstupní abeceda $\Sigma_3 = \Sigma_1$
+      \item[$\circ$] Přechodová funkce $\delta_3: Q_3\times \Sigma_3 \rightarrow 2^{Q_3}$ je dána následovně:\\
+	$\forall a\in \Sigma_1$, $\forall q_1^1, q_1^2\in Q_1$ a $\forall q_2^1, q_2^2\in Q_2$:
+	$$ (q_1^2, q_2^2) \in \delta_3((q_1^1, q_2^1), a) \Leftrightarrow q_1^2\in\delta_1(q_1^1, a) \wedge \exists b\in\Sigma_2 : q_2^2\in\delta_2(q_2^1, b)$$
+	%kde $a\in \Sigma_1$, $q_1, q_3\in Q_1$ a $q_2, q_4\in Q_2$.
+      \item[$\circ$] Počáteční stav $q_3^0 = (q_1^0, q_2^0)$
+      \item[$\circ$] Množina koncových stavů $F_3 = F_1\times F_2$
+     \end{itemize}
+    \end{itemize}
+ \item {\bfseries Příklad}
+  \begin{itemize}
+    \item[--] Předpokládejme, že jazyk $L$ je regulární. Potom podle Pumping lemma (PL) existuje konstanta $p > 0$ taková, že platí: 
+    $w\in L\wedge |w| \geq p \Rightarrow w = xyz \wedge y\neq\varepsilon \wedge |xy|\leq p\wedge xy^iz\in L $ pro $i \geq 0$.
+    \item[--] Uvažujme libovolné celočíselné $p > 0$. Řetezec $w$ zvolme následovně: \\$w = a^{2p}b^{4p}c^{2p+1} \in L$, přičemž $|w| = 8p + 1 \geq p$.
+    \item[--] Potom tedy z PL plyne, že 
+    $\exists x,y,z\in \Sigma^*$: $w = xyz \wedge y\neq\varepsilon \wedge |xy|\leq p\wedge xy^iz\in L $ pro $i\geq 0$.
+    \item[--] Z řetězců $x,y,z\in\Sigma^*$, které splňují 
+    předchozí podmínku zvolíme libovolné z nich. 
+    Tím pádem $x = a^n$, $y = a^m$, $z = a^{2p-m-n}b^{4p}c^{2p+1}$ pro nějaké $n, m\in\mathbb{N}_0, m\neq 0, m + n \leq p$.
+    \item[--] Potom ale také musí platit, že
+    $xy^iz =a^{2p - m + mi}b^{4p}c^{2p+1} \in L$ pro $i\geq 0$. Zvolíme-li $i = 0$, dostáváme $w = a^{2p - m}b^{4p}c^{2p+1}$, což ale znamená, že $w\notin L$, 
+    protože $4p \neq 2(2p - m)$, kde $m > 0$. Což je spor. Jazyk $L$ tedy není regulární.
+  \end{itemize}
+ \item {\bfseries Příklad}
+  \begin{enumerate}
+   \item Z definice regulárních množin plyne, že každá regulární množina je zároveň i jazyk nad danou abecedou.
+    Je možné tedy používat operace definované pro jazyky. Zejména tedy pro operaci $\cdot$ platí distributivní zákon vzhledem k $\cup$ i pro regulární množiny. 
+    Nechť $A$ je libovolná regulární množina. Potom z definice $A^*$ (definice 2.9, opora k předmětu TIN) dostáváme:
+    $$
+      \{\varepsilon\}\cup A\cdot A^* = \{\varepsilon\}\cup A\cdot(A^0 \cup A^1\cup A^2\cup A^3\cup \cdots)
+    $$
+    S využitím distributivity operací $\cdot$ a $\cup$ a faktu, že $A^0 = \{\varepsilon\}$, můžeme předchozí rovnost upravit následovně
+    $$
+      \{\varepsilon\}\cup A\cdot(A^0 \cup A^1\cup A^2\cup \cdots) = A^0\cup A^1 \cup A^2\cup A^3\cup \cdots = A^*,
+    $$
+    čímž je rovnost $\{\varepsilon\}\cup A\cdot A^* = A^*$ pro $A_{RM}$ dokázána.
+    
+    \item Nechť $\Sigma$ je libovolná abeceda. Dále předpokládejme regulární množiny $A = \{a\}$ a $B = \{ aa\}$, pro $a \in\Sigma$ ($a$ je libovolný symbol abecedy $\Sigma$). Vzhledem
+    k tomu, že abeceda je konečná, neprázdná množina symbolů, takový prvek $a$ určitě existuje.
+    Potom ale $A\not\subseteq B$ a $B\not\subseteq A$. $\subseteq$ tedy v $A_{RM}$ není totální uspořádání.
+  \end{enumerate}
+
+\end{enumerate}
+
+
+
+\end{document}

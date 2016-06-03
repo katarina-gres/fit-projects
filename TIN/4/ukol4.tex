@@ -1,0 +1,164 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+\usepackage[IL2]{fontenc}
+\usepackage[left=3cm,text={15cm, 23cm},top=3.5cm]{geometry}
+
+\usepackage{graphicx}
+\usepackage{tikz}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{forest}
+\usepackage[ruled,czech,linesnumbered,noline]{algorithm2e}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{textcomp}
+
+\usepackage{xpatch}
+\xpretocmd{\algorithm}{\hsize=\linewidth}{}{}
+\xpretocmd{\procedure}{\hsize=\linewidth}{}{}
+
+\usepackage{enumitem}
+%\usepackage[neverdecrease]{paralist}
+
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
+
+\newcounter{counten}
+\setcounter{counten}{1}
+
+\newtheorem{theorem}{Tvrzení}[counten]
+\newtheorem{corollary}{Důsledek}[counten]
+
+
+
+\title{Úkol č. 4 do předmětu Teoretická informatika}
+\author{Vojtěch Havlena (xhavle03)}
+\date{}
+
+\makeatletter
+\newcommand{\dotminus}{\mathbin{\text{\@dotminus}}}
+
+\newcommand{\@dotminus}{%
+  \ooalign{\hidewidth\raise1ex\hbox{.}\hidewidth\cr$\m@th-$\cr}%
+}
+\makeatother
+
+\begin{document}
+
+\maketitle
+
+\setlist[enumerate,1]{leftmargin=0.2cm}
+
+\begin{enumerate}[label=\textbf{\arabic*}.]
+
+ \item {\bfseries Příklad}
+ 
+ Při vyjadřování funkce $sqrt3$ vycházím z toho, že $sqrt3(x) \leq x$ a toho, že pokud
+ $z^3 \leq x$ potom i $(z - 1)^3 \leq x$. Pro výpočet funkce $sqrt3(x)$ stačí rekurzivně
+ v klesajícím pořadí zkoušet čísla z intervalu $z \in\{1, \dots x\}$ a spočítám počet čísel, pro které platí $z^3 \leq x$.
+ Pro vyjádření funkce $sqrt3$ využiji pomocné funkce $leq$ ($leq(x,y) = 1$ pokud $x\leq y$, jinak $leq(x,y) = 0$) a 
+ $exp3(x) = x^3$ definované následovně:
+ \begin{eqnarray*}
+   &&leq: \mathbb{N}^2 \rightarrow \mathbb{N}\quad leq \equiv monus\circ(\sigma\circ\xi\circ\pi^2_0 \times monus\circ(\pi^2_1\times \pi^2_2))\\
+   &&exp3: \mathbb{N} \rightarrow \mathbb{N}\quad exp3 \equiv mult\circ((mult\circ (\pi^1_1\times \pi^1_1))\times \pi^1_1)
+ \end{eqnarray*}
+ Primitivní rekurze využívaná pro definici $sqrt3$ je potom definována následovně:
+ \begin{eqnarray*}
+  &&g: \mathbb{N} \rightarrow \mathbb{N}\quad g \equiv \xi\circ\pi^1_0\\
+  &&h: \mathbb{N}^3 \rightarrow \mathbb{N}\quad h\equiv plus\circ(leq\circ((exp3\circ\sigma\circ\pi^3_2)\times\pi^3_1)\times\pi^3_3)\\
+  &&f: \mathbb{N}^2 \rightarrow \mathbb{N}\quad f(x,0) = g(x)\\
+  && \quad\quad\quad\quad\quad\quad f(x, y+1) = h(x,y,f(x,y))
+ \end{eqnarray*}
+ Nakonec samotná funkce $sqrt3$ je definována
+ $$
+  sqrt3: \mathbb{N} \rightarrow \mathbb{N}\quad sqrt3 \equiv f\circ(\pi^1_1\times \pi^1_1)
+ $$
+
+ \item {\bfseries Příklad}
+ 
+ Kódování symbolů páskové abecedy $\Gamma = \{a,b,\Delta\}$: $\Delta \approx 0, a\approx 1, b\approx 2$. Obrácený počáteční obsah
+ pásky zakódovaný do čísla o základu $|\Gamma| = 3$: $w = 0210$. Kódování stavů: $q_F = 0, q_0 = 1, q_1 = 2, q_3 = 3$.
+ \begin{enumerate}
+  \item $cursym(210, 1, 1) = quo(210, 3^0) \dotminus mult(3, quo(210, 3^1)) = 210 \dotminus mult(3, 21) = 210 \dotminus 210 = 0$\\
+  $step(210, 1, 1) = (210,2,2)$
+  \item $cursym(210, 2, 2) = quo(210, 3^1) \dotminus mult(3, quo(210, 3^2)) = 21 \dotminus 20 = 1$\\
+  $step(210, 2, 2) = (210, 3, 3)$
+  \item $cursym(210, 3, 3) = quo(210, 3^2) \dotminus mult(3, quo(210, 3^3)) = 2 \dotminus 0 = 2$\\
+  $step(210, 3, 3) = (210, 3, 4)$
+  \item $cursym(210, 3, 4) = quo(210, 3^3) \dotminus mult(3, quo(210, 3^4)) = 0 \dotminus 0 = 0$\\
+  $step(210, 3, 4) = (210, 0, 5)$
+ \end{enumerate}
+ 
+ Rekurzivní vyčíslení funkce $run$:\\
+ $run(210, 1, 1, 0) = (210, 1, 1)$\\
+ $run(210, 1, 1, 1) = step(210, 1, 1) = (210,2,2)$\\
+ $run(210, 1, 1, 2) = step(210,2,2) = (210, 3, 3)$\\
+ $run(210, 1, 1, 3) = step(210, 3, 3) = (210, 3, 4)$\\
+ $run(210, 1, 1, 4) = step(210, 3, 4) = (210, 0, 5)$\\
+ $stoptime(210) = \mu t[\pi^3_2(run(210,1,1,t)) = 0] = 4$
+ 
+ Vyčíslení funkce $f(210)$ je potom tedy
+ $$
+   f(210) = \pi^3_1(run(210, 1, 1, stoptime(210))) = \pi^3_1(run(210, 1, 1, 4)) = 210
+ $$
+ 
+ \item {\bfseries Příklad}
+ 
+ Nechť $L$ je bezkontextový jazyk. Potom k němu existuje gramatika $G = (N, \Sigma, P, S)$ v Chomského normální formě taková, že 
+ $L(G) = L$. Sestavíme 3-páskový NTS $M$, který bude simulovat provádění pravidel v CNF z množiny $P$.
+ \begin{itemize}
+  \item[--] První páska obsahuje vstupní řetězec $w$.
+  \item[--] Druhá páska slouží pro simulaci nejlevější derivace. V průběhu výpočtu obsahuje řetězec, který je celý 
+  tvořen symboly z $\Sigma$ a poslední symbol je z $N$.
+  \item[--] Třetí páska slouží jako zásobník pro neterminály, které jsou součástí větné formy, ale nejsou nejlevější. Kompletní větnou formu 
+  lze sestavit konkatenací užitečného obsahu 2. pásky s užitečným obsahem 3. pásky v reverzním pořadí.
+\end{itemize}
+NTS $M$ potom pracuje tak, že se nejprve na 2. pásku vloží symbol $S$.
+\begin{itemize}
+  \item[--] Nechť $A$ je neterminál na 2. pásce. Potom se opakovaně nedeterministicky zvolí pravidlo $A\rightarrow \alpha \in P$.
+  Pokud $\alpha = BC$, $B, C \in N$, tak se aktuální neterminál na 2. pásce přepíše na $B$ a do zásobníku na 3. pásce se vloží neterminál $C$.
+  Pokud $\alpha = b$, $b\in\Sigma$, tak se přepíše symbol neterminálu na 2. pásce za $b$, hlava se posune o pozici doprava a zapíše se neterminál, 
+  který je na vrcholu zásobníku na 3. pásce (symbol, který je na pozici hlavy na 3. pásce). Na 3. pásce je potom tento symbol vymazán.
+  \item[--] NTS $M$ nakonec zkontroluje, zda obsah 2. pásky je shodný s obsahem 1. pásky (tedy jestli byl vygenerován řetězec $w$). Pokud ano, zastaví
+  přechodem do $q_F$. V opačném případě abnormálně zastaví.
+ \end{itemize}
+
+ Co se týče časové složitosti (počtu kroků NTS $M$), tak přepis symbolů, vkládání a 
+ výběr ze zásobníku lze provést v konstantním počtu kroků (omezeno nějakou kladnou konstantou $k$, 
+ nezávislé na velikosti vstupního řetězce). Pro kontrolu, zda je obsah 2. pásky
+ shodný s obsahem 1. pásky je potřeba $\mathcal{O}(n)$ kroků (toto se ale provede pouze jednou během výpočtu). Vzhledem k 
+ tomu, že gramatika je CNF, tak počet použitých pravidel $p$ pro vygenerování věty o délky $n$ je $p = 2n - 1 = \mathcal{O}(n)$.
+ Celkový počet kroků je tedy vzhledem k výše uvedenému $\mathcal{O}(n)$ a tedy $L\in NTIME(n)$.
+ 
+ \item {\bfseries Příklad}
+ 
+ Pro důkaz toho, že problém \uv{postačuje $k$ barev pro obarvení turistických tras} je NP-těžký použiji redukci z hranového barvení 
+ grafu, který je NP-úplný. Hranové barvení neorientovaného grafu $G = (V, E)$ je přiřazení barev hranám tak, že žádné dvě incidentní
+ hrany nemají stejnou barvu. Turistické trasy lze reprezentovat neorientovaným grafem, kde vrcholy jsou rozcestí a hrany jsou 
+ části nějaké trasy. Formálněji značení cest může být dvojice $Z = (R, T)$, kde $R$ je konečná množina rozcestí a $T$ je množina
+ konečných posloupností $r_1r_2\dots r_n$, kde $r_i \in R$ pro $1 \leq i \leq n$. Tyto jednotlivé posloupnosti reprezentují 
+ trasy, které vedou mezi rozcestími. Barvení tras je potom přiřazení každé trase barvu tak, že trasy, které mají společné nějaké
+ rozcesí, mají různou barvu. 
+ 
+ Polynomiální redukce $f$ přiřazuje instanci hranového barvení $(G = (V,E), k)$ instanci problému značení tras $(Z_G, k)$.
+ Zde $Z_G = (V, T)$, kde $$T = \{uv | u, v \in V \wedge \{u,v\} \in E \}.$$ Tedy instanci hranového barvení zobrazujeme
+ na instanci problému značení tras, kde uvažujeme pouze trasy délky 1. Z uvedeného popisu redukce $f$ plyne, že
+ vstupní graf $G$ je obarvitelný $k$ barvami právě tehdy když trasy jsou obarvitelné $k$ barvami (tedy dostačuje $k$ barev 
+ pro obarvení tras).
+ 
+ Uvedenou redukci lze implementovat úplným deterministickým Turingovým strojem. Předpokládejme, že vstupní graf je kódován jako
+ řetězec (stejně jako hodnota $k$ -- např. v bin. kódu). Kódovanou instanci problému značení tras lze pro 
+ vhodné kódování vytvořit v čase $\mathcal{O}(n)$ (kopírování vstupu na pomocnou pásku, úprava do kódu značení cest 
+ a okopírování zpět na první pásku). Celková složitost DTS je tedy polynomiální.
+ 
+
+\end{enumerate}
+
+
+
+\end{document}

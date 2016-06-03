@@ -1,0 +1,336 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+\usepackage[IL2]{fontenc}
+\usepackage[left=3cm,text={15cm, 23cm},top=3.5cm]{geometry}
+
+\usepackage{graphicx}
+\usepackage{tikz}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{forest}
+\usepackage[ruled,czech,linesnumbered,noline]{algorithm2e}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{textcomp}
+
+\usepackage{xpatch}
+\xpretocmd{\algorithm}{\hsize=\linewidth}{}{}
+\xpretocmd{\procedure}{\hsize=\linewidth}{}{}
+
+\usepackage{enumitem}
+%\usepackage[neverdecrease]{paralist}
+
+\usepackage{pgf}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
+
+\newcounter{counten}
+\setcounter{counten}{1}
+
+\title{Úkol č. 2 do předmětu Teoretická informatika}
+\author{Vojtěch Havlena (xhavle03)}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\setlist[enumerate,1]{leftmargin=0.2cm}
+
+\begin{enumerate}[label=\textbf{\arabic*}.]
+ \item {\bfseries Příklad}
+  \begin{itemize}
+   \item[--] Předpokládejme, že jazyk $L$ je bezkontextový. Potom podle Pumping lemma pro bezkontextové jazyky 
+    existuje konstanta $k > 0$ taková, že $\forall z\in L \wedge |z| \geq k \Rightarrow z = uvwxy \wedge 
+    vx\neq\varepsilon \wedge |vwx| \leq k \wedge uv^iwx^iy\in L$ pro každé $i \geq 0$.
+    
+   \item[--] Zvolme libovolné takové $k > 0$, splňující výše uvedené. Dále zvolme řetězec $z = a^kb^kc^kd^k \in L$, přičemž
+    $|z| = 4k \geq k$.
+    
+   \item[--] Z řetězců $u, v, w, x, y \in\Sigma^*$, které splňují Pumping lemma zvolme libovolné z nich 
+   ($z = uvwxy$, $|vwx| \leq k$ a $vx\neq\varepsilon$). Libovolný výběr těchto řetězců musí spadnout do nějaké z následujících kategorií.
+   \begin{enumerate}
+    \item $vwx \in \{a\}^+$: Vzhledem k tomu, že $vx\neq\varepsilon$, tak pro $i \geq 2$  řetězec 
+      $z' = uv^iwx^iy \notin L$, protože počet symbolů $a$ v řetězci $z'$ je alespoň o 1 větší, než je počet symbolů $c$ v řetězci $z'$.
+    \item $vwx \in \{a\}^+.\{b\}^+$: V případě, kdy $v$ či $x$ obsahuje symboly $a$ i $b$, řetězec $z' = uv^iwx^iy \notin L$ pro $i\geq 2$, protože 
+      v řetězci $z'$ bude více alternací mezi podřetězci. V případě, kdy $v$ i $x$ jsou tvořeny buď pouze symboly $a$ nebo pouze symboly $b$, tak 
+      pro $i \geq 2$ řetězec $z' = uv^iwx^iy \notin L$, protože buď je počet symbolů $a$ v $z'$ větší jak počet symbolů $c$ v $z'$, nebo je počet 
+      symbolů $b$ v $z'$ větší jak počet symbolů $d$ v $z'$ (popřípadě oba zároveň). 
+      (Zvýšil se počet symbolů $a$ nebo $b$, ale počet symbolů $c$ a $d$ v $z'$ zůstává stejný).
+    \item $vwx \in \{b\}^+$: Opět pro $i \geq 2$ řetězec 
+      $z' = uv^iwx^iy \notin L$, protože počet symbolů $b$ v řetězci $z'$ je alespoň o 1 větší, než je počet symbolů $d$ v řetězci~$z'$.
+    \item $vwx \in \{b\}^+.\{c\}^+$: Opět v případě, kdy $v$ či $x$ obsahuje symboly $b$ i $c$, řetězec $z' = uv^iwx^iy \notin L$ pro $i\geq 2$, protože 
+      v řetězci $z'$ bude více alternací mezi podřetězci. V případě, kdy $v$ i $x$ jsou tvořeny buď pouze symboly $b$ nebo pouze symboly $c$, tak 
+      pro $i \geq 2$ řetězec $z' = uv^iwx^iy \notin L$, protože buď je počet symbolů $b$ v $z'$ větší jak počet symbolů $d$ v $z'$, nebo je počet 
+      symbolů $c$ v $z'$ větší jak počet symbolů $a$ v $z'$ (popřípadě oba zároveň). 
+      (Zvýšil se počet symbolů $b$ nebo $c$, ale počet symbolů $a$ a $d$ v $z'$ zůstává stejný).
+    \item $vwx \in \{c\}^+$: Pro $i \geq 2$ řetězec 
+      $z' = uv^iwx^iy \notin L$, protože počet symbolů $c$ v řetězci $z'$ je alespoň o 1 větší, než je počet symbolů $a$ v řetězci~$z'$.
+    \item $vwx \in \{c\}^+.\{d\}^+$: Opět v případě, kdy $v$ či $x$ obsahuje symboly $c$ i $d$, řetězec $z' = uv^iwx^iy \notin L$ pro $i\geq 2$, protože 
+      v řetězci $z'$ bude více alternací mezi podřetězci. V případě, kdy $v$ i $x$ jsou tvořeny buď pouze symboly $c$ nebo pouze symboly $d$, tak 
+      pro $i \geq 2$ řetězec $z' = uv^iwx^iy \notin L$, protože buď je počet symbolů $c$ v $z'$ větší jak počet symbolů $a$ v $z'$, nebo je počet 
+      symbolů $d$ v $z'$ větší jak počet symbolů $b$ v $z'$ (popřípadě oba zároveň). 
+      (Zvýšil se počet symbolů $c$ nebo $d$, ale počet symbolů $a$ a $b$ v $z'$ zůstává stejný).
+    \item $vwx \in \{d\}^+$: Pro $i \geq 2$ řetězec 
+      $z' = uv^iwx^iy \notin L$, protože počet symbolů $d$ v řetězci $z'$ je alespoň o 1 větší, než je počet symbolů $b$ v řetězci~$z'$.
+   \end{enumerate}
+   \item[--] Pro žádný výběr řetězců $u, v, w, x, y$ nejsme schopni dosáhnout toho, aby $z = uvwxy \wedge vx \neq\varepsilon \wedge |vwx| \leq k \wedge \forall i \geq 0: uv^iwx^iy\in L$, což je spor.
+   Jazyk $L$ tedy není bezkontextový.
+  \end{itemize}
+ 
+ 
+ \item {\bfseries Příklad}
+ 
+  V celém příkladu pracuji s následujícím vyjádřením rozdílu množin: $L\setminus L' = \overline{L'}\cap L$.
+  Dále pokud nebude řečeno jinak, všechny zmíněné věty pocházení z opory k předmětu TIN.
+  \begin{enumerate}
+   \item $L \in\mathcal{L}_3, L' \in\mathcal{L}_3$: Podle věty 3.23 jsou regulární jazyky uzavřeny vůči průniku
+    i doplňku, tedy i $\overline{L'}\cap L = L\setminus L'$ bude regulární jazyk a tím pádem i bezkontextový jazyk.
+    
+   \item $L \in\mathcal{L}_3, L' \in\mathcal{L}_2$: Podle věty 4.24 bezkontextové jazyky nejsou uzavřeny vůči doplňku
+    a tedy $\overline{L'}$ není nutně bezkontextový jazyk. Nyní předpokládejme, že $L, L'$ jsou jazyky nad abecedou $\Sigma$, potom stačí zvolit $L = \Sigma^* \in\mathcal{L}_3$, 
+    tedy $L\setminus L' = \overline{L'}\cap L = \overline{L'}$, což podle předchozí věty není nutně bezkontextový jazyk. A tedy $L\setminus L'$ není
+    nutně bezkontextový jazyk. 
+    
+   \item $L \in\mathcal{L}_2, L' \in\mathcal{L}_3$: Podle  věty 3.23 jsou regulární jazyky uzavřeny vůči doplňku, tedy 
+    $\overline{L'}\in\mathcal{L}_3$. Dále podle věty 4.22 jsou bezkontextové jazyky uzavřeny vzhledem k průniku s regulárními
+    jazyky, tedy $\overline{L'}\cap L = L\setminus L'$ je nutně bez\-kon\-textový jazyk.
+    
+   \item $L \in\mathcal{L}_2, L' \in\mathcal{L}_2$: Podle věty 4.24 bezkontextové jazyky nejsou uzavřeny vůči doplňku a průniku.
+    Jazyk $\overline{L'}$ tedy není nutně bezkontextový. Nyní opět předpokládejme, že $L, L'$ jsou jazyky nad abecedou $\Sigma$, potom stačí zvolit $L = \Sigma^* \in\mathcal{L}_2$, 
+    tedy $L\setminus L' = \overline{L'}\cap L = \overline{L'}$, což podle předchozí věty není nutně bezkontextový jazyk. A tedy 
+    $L\setminus L'$ není nutně bezkontextový jazyk.
+  \end{enumerate}
+
+  \enlargethispage{1em}
+ \item {\bfseries Příklad}
+ \begin{enumerate}
+  \item Algoritmus pro výpočet minimální váhy je založen na iterativním výpočtu minimální váhy řetězce, který lze vyderivovat 
+  z každého neterminálního symbolu v gramatice $G$, převedenou do Chomského normální formy. Tato minimální váha pro každý neterminál je označena jako $M_A$, $A\in N$. 
+  
+  Hlavní myšlenka algoritmu je následující: Na začátku je pro každý neterminál nastavena hodnota $M_A := \infty$. Pro pravidla gramatiky ve tvaru $A\rightarrow x$, $x\in(\Sigma\cup\{\varepsilon\})$, je možné $M_A$ spočítat přímo jako $M_A = \min(M_A, ||x||)$.
+  Jakmile již došlo k nastavení hodnoty $M_A < \infty$, tak je možné uvažovat i pravidla, která obsahují na pravé straně právě tyto neterminály, 
+  které již mají předběžně spočítanou minimální váhu. Potom tedy pro pravidla tvaru $A \rightarrow BC$, $A, B, C \in N$, se $M_A$ spočítá jako $M_A = \min(M_A, M_B + M_C)$.
+  V případě, že je hodnota $M_A$ aktualizována (tj. nastavena na menší váhu), tak je nutné znovu přepočítat váhu neterminálů, které vystupují 
+  na levé straně pravidlech obsahující $A$ na pravé straně pravidla. Tedy pokud aktualizuji hodnotu $M_A$ je nutné přepočítat váhu všech neterminálů $B$, takových, že 
+  $B\rightarrow AX$ nebo $B\rightarrow XA$, $X,B,A \in N$, jsou pravidla z $P$ (toto zajišťuje procedura Aktualizuj).
+  Tento postup se opakuje, dokud minimální váha není spočítána pro každý neterminál. Potom výstupem algoritmu je hodnota $M_S$, kde $S$ je výchozí symbol gramatiky.
+  
+  \enlargethispage{1em}
+   \begin{procedure}[H]
+  \caption{Aktualizuj($P$, $B$)}
+ \SetNlSty{}{}{:}
+ \SetNlSkip{-1.0em}
+ \SetInd{0.5em}{0.5em}
+ \Indentp{1.4em}
+    \ForEach{$A \rightarrow X_1X_2 \in P$, kde $X_1 = B \vee X_2 = B$, $X_1, X_2, A \in N'$}
+    {
+      \If{$M_A > M_{X_1} + M_{X_2}$}
+      {
+	$M_A := M_{X_1} + M_{X_2} $ \\
+	Aktualizuj($P$, $A$)
+      }
+    }
+\end{procedure}
+  
+  \begin{algorithm}[H]
+ \SetKwInput{Input}{Vstup}\SetKwInOut{Output}{Výstup}
+ \SetNlSty{}{}{:}
+ \SetNlSkip{-1.0em}
+ \SetInd{0.5em}{0.5em}
+ \Input{Bezkontextová gramatika $G = (N,\Sigma, P, S)$}
+ \Output{Váha bezkontextové gramatiky, $||G||$}
+ \BlankLine
+ \Indentp{1.4em}
+    Převedení $G$ na ekvivalentní gramatiku $\overline{G}$ bez zbytečných symbolů.\\
+    Převedení gramatiky $\overline{G}$ na ekvivalentní gramatiku $G'$ v Chomského normální formě, $G' = (N', \Sigma', P', S)$\\
+    Polož $M_A := \infty$ pro každé $A \in N'$\\
+    Polož $N_0 := \emptyset$, $P_0 = \emptyset$, $i := 1$\\
+    \Repeat{$N_{i - 1} = N_{i-2}$}
+    {
+      $N_i := \{A| A\rightarrow \alpha \in P' \wedge \alpha\in(N_{i-1} \cup \Sigma)^*\} \cup N_{i-1}$\\
+      $P_i := \{A \rightarrow \alpha | A \rightarrow \alpha \in P' \wedge \alpha\in(N_{i-1} \cup \Sigma)^*\}$\\
+      \ForEach{$A \rightarrow \alpha \in P_i$}
+      {
+	\uIf{ $\alpha = x$, kde $x\in\Sigma'\ \mathbf{and}\ M_A > ||x||$}
+	{
+	  $M_A := ||x||$\\
+	  Aktualizuj($P_i$, $A$)
+	}
+	\ElseIf{$\alpha = CD$, kde $C, D \in N'\ \mathbf{and}\ M_A > M_C + M_D$}
+	{
+	  $M_A := M_C + M_D$\\
+	  Aktualizuj($P_i$, $A$)
+	}
+      }
+      $i := i + 1$\\
+    }
+    \Return $M_S$
+ \caption{\textsc{Minimální váha gramatiky, $\Sigma \subset \mathbb{N}$}}
+ \label{fastSlam}
+\end{algorithm}
+\enlargethispage{1em}
+  \item Pokud $\Sigma \subset\mathbb{Z}$, může nastat situace, kdy $M_A = -\infty$.
+  Toto může nastat tehdy, pokud v $G$ existuje derivace $A\Rightarrow^*\alpha A \beta$ a 
+  $M_\alpha + M_\beta < 0$, kde $\alpha, \beta \in (N \cup \Sigma)^*$ a $M_\alpha$ je součet minimálních vah 
+  symbolů v řetězci $\alpha$. Pro detekci těchto záporných derivací upravíme praceduru Aktualizuj.
+  Tuto proceduru rozšíříme o možnost uložení (množina $T$) všech pravidel, které vedly ke snížení hodnoty $M_A$.
+  Pokud použijeme pravidlo, které se již v množině $T$ vyskytuje a pokud navíc dojde opět ke snížení hodnoty $M_A$, 
+  znamená to, že $A \Rightarrow^*\alpha A \beta$ a navíc došlo ke snížení hodnoty $M_A$, tedy $M_A > M_A + M_\alpha + M_\beta$.
+  Což znamená, že $M_\alpha + M_\beta < 0$ a vznikla tedy záporná rekurze a tom případě nastavíme $M_A := -\infty$.
+  
+  \enlargethispage{1em}
+   \begin{procedure}[H]
+  \caption{Aktualizuj($P$, $B$, $T$)}
+ \SetNlSty{}{}{:}
+ \SetNlSkip{-1.0em}
+ \SetInd{0.5em}{0.5em}
+ \Indentp{1.4em}
+    \ForEach{$A \rightarrow X_1X_2 \in P$, kde $X_1 = B \vee X_2 = B$, $X_1, X_2, A \in N'$}
+    {
+      \uIf{$M_A > M_{X_1} + M_{X_2}$}
+      {
+	\uIf{$A \rightarrow X_1X_2 \in T$}
+	{
+	  $M_A := -\infty$
+	}
+	\Else
+	{
+	  $M_A := M_{X_1} + M_{X_2} $
+	}
+	Aktualizuj($P$, $A$, $T\cup \{A \rightarrow X_1X_2\}$)
+      }
+    }
+\end{procedure}
+
+    \begin{algorithm}[H]
+ \SetKwInput{Input}{Vstup}\SetKwInOut{Output}{Výstup}
+ \SetNlSty{}{}{:}
+ \SetNlSkip{-1.0em}
+ \SetInd{0.5em}{0.5em}
+ \Input{Bezkontextová gramatika $G = (N,\Sigma, P, S)$}
+ \Output{Váha bezkontextové gramatiky, $||G||$}
+ \BlankLine
+ \Indentp{1.4em}
+    Převedení $G$ na ekvivalentní gramatiku $\overline{G}$ bez zbytečných symbolů.\\
+    Převedení gramatiky $\overline{G}$ na ekvivalentní gramatiku $G'$ v Chomského normální formě, $G' = (N', \Sigma', P', S)$\\
+    Polož $M_A := \infty$ pro každé $A \in N'$\\
+    Polož $N_0 := \emptyset$, $P_0 = \emptyset$, $i := 1$\\
+    \Repeat{$N_{i - 1} = N_{i-2}$}
+    {
+      $N_i := \{A| A\rightarrow \alpha \in P' \wedge \alpha\in(N_{i-1} \cup \Sigma)^*\} \cup N_{i-1}$\\
+      $P_i := \{A \rightarrow \alpha | A \rightarrow \alpha \in P' \wedge \alpha\in(N_{i-1} \cup \Sigma)^*\}$\\
+      \ForEach{$A \rightarrow \alpha \in P_i$}
+      {
+	\uIf{ $\alpha = x$, kde $x\in\Sigma'\ \mathbf{and}\ M_A > ||x||$}
+	{
+	  $M_A := ||x||$\\
+	  Aktualizuj($P_i$, $A$, $\{A \rightarrow \alpha\}$)
+	}
+	\ElseIf{$\alpha = CD$, kde $C, D \in N'\ \mathbf{and}\ M_A > M_C + M_D$}
+	{
+	  $M_A := M_C + M_D$\\
+	  Aktualizuj($P_i$, $A$, $\{A \rightarrow \alpha\}$)
+	}
+      }
+      $i := i + 1$\\
+    }
+    \Return $M_S$
+ \caption{\textsc{Minimální váha gramatiky, $\Sigma \subset \mathbb{Z}$}}
+ \end{algorithm}
+ \end{enumerate}
+
+ 
+ \item {\bfseries Příklad}
+    \begin{itemize}
+     \item[--] Tvrzení dokážeme indukcí k počtu symbolů 0 ve slově $w \in L$ (počet symbolů 0 je označen jako $n$) .
+     \item[--] {\it Bázový případ} $n = 0$ (počet symbolů 0 je roven nule). V tomto případě $w = 0^01^k \in L$, kde
+      $0 \leq k \leq 0$. Tedy $k = 0$ a $w = 0^01^0 = \varepsilon \in L$. V gramatice $G$ ale existuje
+      derivace $S \Rightarrow \varepsilon$ a tedy $w = \varepsilon \in L(G)$.
+     \item[--] {\it Indukční krok}. Předpokládejme, že tvrzení platí pro všechny řetězce $w' \in L$, kde $\#_0(w')\leq n$
+      pro nějaké $n\geq 0$. Ukážeme, že tvrzení platí i pro řetězce $w$ takové, že $\#_0(w) = n + 1$.
+      \begin{itemize}
+       \item Nejprve zvolme řetězec $w \in L$ takový, že platí $\#_0(w) = n + 1 > 0$. Tedy $w = 0^{n+1}1^k$, kde
+      $0\leq 2(n+1) \leq k \leq 3(n+1)$. 
+      
+      \item Podle indukčního předpokladu, pro řetězec $w'= 0^n1^l \in L$, kde $0\leq 2n\leq l \leq 3n$
+      a $\#_0(w') = n$, platí, že $w'\in L(G)$. Tím pádem existuje derivace $S \Rightarrow^* w'$. 
+      
+      \item Vzhledem k tomu, že $0 \leq 2n + 2 \leq k$ a $0 \leq 2n \leq l$, pro $n > 0$, tak $2 \leq k - l$.
+      Podobně z druhé části nerovnice $k \leq 3n + 3$ a $l \leq 3n$ dostáváme $k - l \leq 3$. Dohromady tedy máme
+      $2 \leq k-l \leq 3$. V řetězci $w$ je 
+      tedy o 2 nebo o 3 více symbolů 1 než v řetězci $w' \in L(G)$. Řetězec $w$ tedy můžeme zapsat následovně:
+      $w = 0w'11 = 00^n1^l11$ nebo $w = 0w'111 = 00^n1^l111$. Nyní budeme postupně zkoumat oba případy.
+      \begin{enumerate}
+       \item Nejprve případ, kdy $w = 00^n1^l11$. V gramatice $G$ máme pravidlo $S\rightarrow 0S11$. S využitím výše uvedeného
+        dostáváme $S \Rightarrow 0S11 \Rightarrow^* 00^n1^l11 = w$ a tedy $S \Rightarrow^* w$ a tudíž $w \in L(G)$.
+        
+       \item Nyní případ, kdy $w = 00^n1^l111$. V gramatice $G$ máme pravidlo $S\rightarrow 0S111$. Opět s využitím výše uvedeného
+        dostáváme $S \Rightarrow 0S111 \Rightarrow^* 00^n1^l111 = w$ a tedy $S \Rightarrow^* w$ a tudíž opět $w \in L(G)$.
+      \end{enumerate}
+      \end{itemize}
+      \item [--] Dokázali jsme tedy, že $L\subseteq L(G)$.
+    \end{itemize} 
+    
+ \item {\bfseries Příklad}
+ \begin{enumerate}
+  \item Gramatika není jednoznačná, je víceznačná, protože generuje víceznačnou větu 
+  $w = \mathbf{if}\ cond\ \mathbf{if}\ cond\ com\ \mathbf{else}\ com$. Této větě odpovídají
+  dva derivační stromy:
+  \begin{center}
+   \begin{forest}
+      [$S$ [$\mathbf{if}$] [$cond$] [$S$ [$\mathbf{if}$] [$cond$] [$S$ [$com$]] [$\mathbf{else}$] [$S$ [$com$]]]]
+    \end{forest}
+    \begin{forest}
+      [$S$ [$\mathbf{if}$] [$cond$] [$S$ [$\mathbf{if}$] [$cond$] [$S$ [$com$]]] [$\mathbf{else}$] [$S$ [$com$]]]
+    \end{forest}
+   \end{center}
+   
+   \item Jazyk $L(G)$ není jazyk s inherentní víceznačností, protože pro něj existuje jednoznačná bezkontextová gramatika $G'$.
+   Tato gramatika je definována jako $G' = (\{S, B\}, \{\mathbf{if}, \mathbf{else}, cond, com\}, P, S)$ s pravidly
+   \begin{eqnarray*}
+      S &\rightarrow& \mathbf{if}\ cond\ S\ |\ \mathbf{if}\ cond\ B\ \mathbf{else}\ S\ |\ com\\
+      B &\rightarrow& \mathbf{if}\ cond\ B\ \mathbf{else}\ B\ |\ com
+   \end{eqnarray*}
+
+   \item Výsledný deterministický zásobníkový automat přijímající jazyk $L(G)$:
+   \begin{center}
+      \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=3.4cm,
+			  semithick]
+	\tikzstyle{every state}=[text=black]
+
+	\node[state,initial,initial text={\#}] (A)             {$q_0$};
+	\node[state]         (B) [right of=A,above of=A] {$q_1$};
+	\node[state,accepting]         (C) [right of=A,below of=A] {$q_2$};
+	\node[state,accepting]         (D) [node distance=9cm,right of=A] {$q_3$};
+
+	\path (A) edge  [align=left,bend left]            node {$\mathbf{if},\#/0\#$ \\ $\mathbf{if},0/00$} (B)
+	      (B) edge [align=left,bend left] node {$cond,0/0$} (A)
+	      (A) edge  [align=left]            node {$com,\#/\#$} (D)
+	      (A) edge  [align=left,bend left]            node {$com, 0/0$} (C)
+	      (C) edge  [align=left,bend left]            node {$\mathbf{else},0/\varepsilon$} (A);
+      \end{tikzpicture}
+      \end{center}
+     Přijetí slova $w = \mathbf{if}\ cond\ \mathbf{if}\ cond\ com\ \mathbf{else}\ com\ \mathbf{else}\ \mathbf{if}\ cond\ com$:
+     \begin{eqnarray*}
+      (q_0, w, \#) &\vdash& (q_1, cond\ \mathbf{if}\ cond\ com\ \mathbf{else}\ com\ \mathbf{else}\ \mathbf{if}\ cond\ com, 0\#) \vdash \\
+      &\vdash& (q_0, \mathbf{if}\ cond\ com\ \mathbf{else}\ com\ \mathbf{else}\ \mathbf{if}\ cond\ com, 0\#) \vdash\\
+      &\vdash& (q_1, cond\ com\ \mathbf{else}\ com\ \mathbf{else}\ \mathbf{if}\ cond\ com, 00\#) \vdash\\ 
+      &\vdash&(q_0, com\ \mathbf{else}\ com\ \mathbf{else}\ \mathbf{if}\ cond\ com, 00\#) \vdash\\
+      &\vdash& (q_2, \mathbf{else}\ com\ \mathbf{else}\ \mathbf{if}\ cond\ com, 00\#) \vdash \\
+      &\vdash&(q_0, com\ \mathbf{else}\ \mathbf{if}\ cond\ com, 0\#) \vdash (q_2, \mathbf{else}\ \mathbf{if}\ cond\ com, 0\#) \vdash\\
+      &\vdash&(q_0, \mathbf{if}\ cond\ com, \#) \vdash (q_1, cond\ com, 0\#) \vdash (q_0, com, 0\#) \vdash\\
+      &\vdash&(q_2, \varepsilon, 0\#) 
+     \end{eqnarray*}
+ \end{enumerate}
+
+
+\end{enumerate}
+
+
+
+\end{document}
