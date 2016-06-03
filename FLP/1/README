@@ -1,0 +1,24 @@
+
+Dokumentace k projektu do predmetu FLP (RKA-2-DKA)
+Autor: Vojtech Havlena, xhavle03
+
+Zdrojove kody jsou rozdeleny do 3 souboru:
+ -- Automaton.hs -- Samotny prevod RKA na DKA, vcetne definice dat. struktur Automatu apod.
+ -- InputParser.hs -- Parsovani vstupniho retezce na typ Automatu
+ -- RKAtoDKA.hs -- Rizeni cinnosti prevodu podle parametru programu.
+ 
+Pouziti:
+ rka-2-dka [-i|-t] [vstup]
+ -i Vypis nacteneho RKA na stdout.
+ -t prevod RKA na DKA a vypis na stdout.
+ Pozn. prazdne radky na vstupu mezi prechody jsou ignorovany.
+
+Testy:
+ Moje vlastni testovaci vstupy s vystupy jsou ulozeny ve slozce ./Testy (sezbirany z 
+ ruznych knih a z predmetu IFJ a TIN). Vystupy jsou ulozeny ve slozce ./Testy/Out.
+ 
+Rozsireni:
+ Krome pozadavnku ze zadani jsem implementoval take kontrolu, zda vstupni RKA odpovida 
+ formatu a kontrola validity definice automatu (zda stavy v prechodech jsou skutecne z 
+ mnoziny zadanych stavu apod). Testovaci vstupy pro rozsireni jsou ve slozce Testy/Extra.
+ 
