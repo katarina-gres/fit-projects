@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+  <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2" />
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  <title>Projekt do předmětu GAL</title>
+  </head>
+  <body>
+   <h1>Generování bludišť - projekt do předmětu GAL</h1>
+   <form id="frm1" action="projekt.html">
+     Velikost bludiště (interval 10 - 20): <input type="text" name="size" id="sizeInput"><br>
+     Počáteční buňka (číslováno od 1): <input type="text" name="start" id="startInput"><br>
+     Koncová buňka buňka: <input type="text" name="end" id="endInput"><br><br>
+     <input type="button" onclick="submitFunction()" value="Vygeneruj bludiště">
+   </form>
+    <canvas id="myCanvas" width="700" height="700"></canvas>
+    
+    <script type="text/javascript" src="MazeGenerator.js"></script>
+    <script type="text/javascript" src="MazeDrawer.js"></script>
+    <script>
+      function submitFunction() {
+         var sizeInput = document.getElementById('sizeInput');
+         var startInput = document.getElementById('startInput');
+         var endInput = document.getElementById('endInput');
+         var canvas = document.getElementById('myCanvas');
+         var context = canvas.getContext('2d');
+      
+         if(!sizeInput.value || sizeInput.value.length == 0 || isNaN(sizeInput.value))
+         {
+            alert('Musíte vyplnit všechna políčka ve správném formátu.');
+            return;
+         }
+         if(!startInput.value || startInput.value.length == 0 || isNaN(startInput.value))
+         {
+            alert('Musíte vyplnit všechna políčka ve správném formátu.');
+            return;
+         }
+         if(!endInput.value || endInput.value.length == 0 || isNaN(endInput.value))
+         {
+            alert('Musíte vyplnit všechna políčka ve správném formátu.');
+            return;
+         }
+         
+         var n = parseInt(sizeInput.value);
+         var start = parseInt(startInput.value);
+         var end = parseInt(endInput.value);
+         if(n < 10 || n > 20)
+         {
+            alert('Rozměr bludiště musí být větší než 10 a menší než 20.');
+            return;
+         }
+         if(start > n || start < 1 || end > n || end < 1)
+         {
+            alert('Pozice počáteční a koncové buňky jsou mimo povolený interval.');
+            return;
+         }
+         
+         var generator = new MazeGenerator(n);
+         generator.divideMaze(start - 1, n*(n-1) + end - 1);
+
+         context.lineWidth = 2;
+         var drawer = new MazeDrawer(n, context, generator.adj, generator.exits);
+         drawer.drawMaze();
+      }
+    </script>
+  </body>
+</html>      
