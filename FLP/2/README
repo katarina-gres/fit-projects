@@ -1,0 +1,10 @@
+
+Dokumentace k logickemu projektu do predmetu FLP (Turinguv stroj)
+Autor: Vojtech Havlena, xhavle03
+
+Zdrojove kody k programu jsou v souboru ts.pl. Implementovano pomoci
+IDS prohledavani stavoveho prostoru.
+
+Testy:
+ Moje vlastni testovaci vstupy, ktere testuji ruzne aspekty programu jsou 
+ ulozeny ve slozce ./input. Doba behu vsech testu je do par sekund.
