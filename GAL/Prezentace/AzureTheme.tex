@@ -1,0 +1,108 @@
+%
+% Azurove tema prezentace.
+% Autor: Vojtech Havlena, FIT VUT
+% Licence: GNU General Public License
+%
+\usepackage{etoolbox}
+%Vychozi schema
+\usetheme{default}
+\setbeamercolor{normal text}{fg=black}
+
+\makeatletter
+%Komprimovani velikosti hlavicky
+\beamer@compresstrue
+\makeatother
+
+
+\makeatletter
+\patchcmd{\slideentry}{\advance\beamer@tempdim by -.05cm}{\advance\beamer@tempdim by\beamer@vboxoffset\advance\beamer@tempdim by\beamer@boxsize\advance\beamer@tempdim by 1.2\pgflinewidth}{}{}
+\patchcmd{\slideentry}{\kern\beamer@tempdim}{\advance\beamer@tempdim by 2pt\advance\beamer@tempdim by\wd\beamer@sectionbox\kern\beamer@tempdim}{}{}
+\makeatother
+
+%Sablona pro titulek
+\setbeamertemplate{frametitle}
+{
+  \vspace{1mm}
+  \insertframetitle\\[-2.5mm]
+  \rule{\textwidth}{0.3mm}
+}
+
+%Sablona pro pocitadlo slidu v dolnim rohu
+\addtobeamertemplate{navigation symbols}{}
+{
+    \usebeamerfont{footline}
+    \usebeamercolor[fg]{footline}
+    \hspace{1em}
+    \insertframenumber/\inserttotalframenumber
+}
+
+%Nastaveni okraju
+\setbeamersize{text margin left=7mm}
+\setbeamersize{text margin right=7mm}
+
+%Definice barev pro hlavicku
+\definecolor{headFontColor}{RGB}{215, 232, 245}
+\definecolor{headBgColor}{RGB}{0,0,0}
+\definecolor{blockColor}{HTML}{EBF3FA}
+\definecolor{blockHeadColor}{HTML}{B1D2EC}
+%Barva hlavicky slidu
+\setbeamercolor{section in head/foot}{fg = headBgColor, bg = headFontColor}
+
+%Definice hlavicky
+\setbeamertemplate{headline}
+{ 
+\begin{beamercolorbox}[wd=\paperwidth,right]{section in head/foot}
+    \rule{\paperwidth}{1pt}
+    \vskip5pt
+    \insertnavigation{\paperwidth}
+    \vskip4.5pt
+\end{beamercolorbox} 
+}
+
+\setbeamertemplate{sections/subsections in toc}[circle]
+%\setbeamertemplate{subsection in toc}{\hspace*{2em}\inserttocsubsection}
+
+%Definice bloku
+\setbeamertemplate{block begin}
+{
+  \vskip.75ex
+  \begin{beamercolorbox}[rounded=true,colsep*=.75ex]{block title}%
+    \usebeamerfont*{block title}\insertblocktitle
+  \end{beamercolorbox}%
+  {\ifbeamercolorempty[bg]{block body}{}{\nointerlineskip\vskip-0.5pt}}%
+  \usebeamerfont{block body}%
+  \begin{beamercolorbox}[rounded=true,colsep*=.75ex,sep=.75ex,vmode]{block body}%
+  \ifbeamercolorempty[bg]{block body}{\vskip-.25ex}{\vskip-.75ex}\vbox{}%
+  }
+  \setbeamertemplate{block end}{
+  \end{beamercolorbox}
+}
+
+\newenvironment<>{highlightblock}[0]{%
+   \begin{beamercolorbox}[rounded=true,vmode]{block body example}{#1}}{\end{beamercolorbox}}
+
+\setbeamertemplate{block begin example}
+{
+  \vskip.75ex
+  %\begin{beamercolorbox}[rounded=true,colsep*=.75ex]{block title example}%
+  %  \usebeamerfont*{block title example}\insertblocktitle
+  %\end{beamercolorbox}%
+  {\ifbeamercolorempty[bg]{block body example}{}{\nointerlineskip\vskip-0.5pt}}%
+  \usebeamerfont{block body example}%
+  \begin{beamercolorbox}[rounded=true,colsep*=.75ex,sep=.75ex,vmode]{block body example}%
+  \ifbeamercolorempty[bg]{block body example}{\vskip-.25ex}{\vskip-.75ex}\vbox{}%
+  }
+  \setbeamertemplate{block end example}{
+  \end{beamercolorbox}
+}
+
+%Nastaveni stylu odrazek
+\setbeamertemplate{itemize item}[circle]
+\setbeamertemplate{itemize subitem}{\pmb{$\circ$}}
+
+%Barva bloku
+\setbeamercolor{block title}{use=structure,fg=black,bg=blockHeadColor}
+\setbeamercolor{block body}{use=structure,fg=black,bg=blockColor}
+
+\setbeamercolor{block title example}{use=structure,fg=black,bg=blockHeadColor}
+\setbeamercolor{block body example}{use=structure,fg=black,bg=blockColor}
