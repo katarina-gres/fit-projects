@@ -1,0 +1,274 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+\usepackage[IL2]{fontenc}
+\usepackage[left=3cm,text={15cm, 23cm},top=3.5cm]{geometry}
+\usepackage{subcaption}
+\usepackage{listings}
+
+\usepackage{color}
+%\usepackage[unicode,plainpages=false,pdftex]{hyperref}
+\usepackage[ruled,czech,linesnumbered,noline]{algorithm2e}
+%\usepackage[dvipdf]{graphicx}
+\usepackage{graphicx}
+\SetKwRepeat{Do}{do}{while}%
+
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+
+\definecolor{grey}{rgb}{0.745098,0.745098,0.745098}
+
+\lstset{ %
+  basicstyle=\scriptsize
+}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+%	\usepackage{graphicx}
+
+\usepackage{tikz}
+
+\title{Dokumentace k 2. projektu do předmětu KRY -- Implementace a prolomení RSA}
+\author{Vojtěch Havlena, xhavle03}
+
+\begin{document}
+\maketitle
+
+\section{Úvod}
+Tato dokumentace se věnuje popisu zvolených metod a algoritmů pro projekt 
+do předmětu Kryptografie -- implementace a prolomení RSA. Cílem práce
+je implementovat program, který umí generovat parametry RSA, šifrovat,
+dešifrovat a faktorizovat zadaný veřejný modulus. Pro implementaci byla zvolena
+knihovna GMP pro manipulaci s velkými čísly a program je napsán v jazyce C++ (je rovněž využíváno
+GMP rozhraní pro C++).
+
+\section{Generování parametrů RSA}
+První implementovanou částí je generování parametrů RSA. Tato část je implementována 
+ve funkci \texttt{GenerateKeys}. Vstupem je 
+velikost veřejného modulu v bitech. Výstupem jsou potom hodnoty $(e,n)$ -- soukromý klíč
+a $(d,n)$ -- veřejný klíč. Generování klíčů probíhá podle následujícícho schématu.
+
+\medskip
+\begin{algorithm}[H]
+ \SetKwInput{Input}{Input}\SetKwInOut{Output}{Output}
+ \SetNlSty{}{}{:}
+ \SetNlSkip{-1.2em}
+ \SetInd{1em}{1em}
+ \Output{Soukromý klíč $(d,n)$, veřejný klíč $(e,n)$}
+ \BlankLine
+ \Indentp{1.7em}
+    Generuj dvě velká prvočísla $p$ a $q$. \\
+    $n \gets pq$ \\
+    $\phi(n) \gets (p-1)(q-1)$ \\
+    Zvol náhodně $e$ mezi $1$ a $\phi(n)$ tak, že $\gcd(e, \phi(n)) = 1$ \\
+    $d \gets inv(e, \phi(n))$\\
+    \Return $(e,n)$, $(d,n)$
+ \caption{\textsc{Schéma generování parametrů RSA}}
+ \label{fastSlam}
+\end{algorithm}
+
+\medskip
+Nyní se blíže podíváme na jednotlivé části a způsob jejich implementace.
+
+\subsection{Generování prvočísel}
+V první části jsou generovány náhodná prvočísla $p,q$ velká tak, aby $n = pq$ bylo na zadaných $B$ bitů (funkce \texttt{GenerateRandomPrime}).
+Tedy je hledáno prvočíslo $p$ s $\lfloor B/2 \rfloor$ bity a prvočíslo $q$ s $\lceil B / 2 \rceil$ bity.
+Náhodná prvočísla jsou generovány následovně: Nejprve je vygenerováno náhodné číslo $r$ o daném počtu bitů.
+Následně jsou nejnižší a dva nejvyšší bity nastaveny na 1 (nejnižším bitem zajistíme, že se jedná o liché číslo).
+V případě, že bychom 2. nejvyšší bit nenastavili na 1, není zaručeno, že vynásobením dvou takových čísel 
+dostaneme číslo o zadané velikosti. Následně je pomocí randomizovaného algoritmu Solovay--Strassen
+testováno, zda $r$ je prvočíslo \cite{nech}. Pokud ne, je číslo zvětšeno o 2 a opět testováno dokud nezískáme 
+prvočíslo (přesněji není označeno alg. Solovay--Strassen za prvočíslo).
+
+V případě, že již máme vygenerovaná prvočísla $p$ a $q$, je nutné provést kontrolu, zda tato prvočísla 
+nejsou stejná. Pokud ano, jsou vygenerována nová prvočísla. Nakonec pokud máme prvočísla $p$, $q$, $p\neq q$,
+tak ještě zkontrolujeme, zda $n = pq$ je na požadovaný počet bitů (postupným přičítáním 2 při generování
+prvočísla jsme mohli dostat příliš velké číslo).
+
+Testování prvočíselnosti je provedeno pomocí již zmíněného algoritmu Solovay--Strassen. Algoritmus
+zapsaný v pseudokódu vypadá následovně.
+
+\medskip
+\begin{algorithm}[H]
+ \SetKwInput{Input}{Input}\SetKwInOut{Output}{Output}
+ \SetNlSty{}{}{:}
+ \SetNlSkip{-1.2em}
+ \SetInd{1em}{1em}
+ \Input{Testované číslo $n$, počet opakování $k$}
+ \Output{$Comp$ pokud je $n$ složené číslo, jinak $probably\_prime$}
+ \BlankLine
+ \Indentp{1.7em}
+    \For{0  $\mathbf{to}\ k$}{
+      Vyber náhodné celé číslo číslo $a$ z intervalu $[2, n-1]$ \\
+      $x \gets \left(\frac{a}{n}\right)$ \\
+      \If{$x = 0\ \mathbf{or}$ $a^{(n-1)/2} \neq x\ (\mod n)$}{
+	\Return $Comp$ \\
+      }
+    }
+    \Return $probably\_prime$
+ \caption{\textsc{Solovay--Strassen}}
+ \label{fastSlam}
+\end{algorithm}
+
+\medskip
+V programu je pro modulární umocňování velkých čísel typu \texttt{mpz\_class} použita vestavěná funkce \texttt{mpz\_powm}. 
+Třída \texttt{mpz\_class} pro reprezentaci velkých čísel umožňuje používat přetížené operátory pro aritmetické operace (+,*, \dots).
+Není tedy nutné volat speciální funkce a zdrojový kód je podstatně přehlednější.
+V algoritmu je pomocí $(\frac{a}{n})$ označen Jacobiho symbol, který je možný spočítat následovně \cite{jac}:
+
+\medskip
+\begin{algorithm}[H]
+ \SetKwInput{Input}{Input}\SetKwInOut{Output}{Output}
+ \SetNlSty{}{}{:}
+ \SetNlSkip{-1.2em}
+ \SetInd{1em}{1em}
+ \Input{Čísla $a, n$ jejichž Jacobiho symbol se má spočítat}
+ \Output{Jacobiho symbol $\left(\frac{a}{n}\right)$}
+ \BlankLine
+ \Indentp{1.7em}
+    $r \gets 1$ \\
+    \While{$a \neq 0$} {
+      \While{$a \mod 2 = 0$} {
+	$a \gets a / 2$ \\
+	\uIf{$n \mod 8 = 3\ \mathbf{or}$ $n \mod 8 = 5$}{
+	  $r \gets -r$ \\
+	}
+      }
+      Prohoď $a$, $n$ \\
+      \uIf{$a \mod 4 = 3\ \mathbf{and}$ $n \mod 4 = 3$}{
+	  $r \gets -r$ \\
+      }
+      $a \gets a \mod n$ \\
+    }
+    \uIf{$n = 1$}{
+      \Return $r$ \\
+    }
+    \Return 0
+ \caption{\textsc{Výpočet Jacobiho symbolu}}
+ \label{fastSlam}
+\end{algorithm}
+
+Jedním z parametrů algoritmu Solovay--Strassen je také počet opakování. V programu jsem
+použil 100 opakování (tato hodnota byla uvedena v \cite{nech}).
+
+\subsection{Generování klíčů}
+V případě, že již máme vygenerovaná různá prvočísla $p$, $q$ o zadané velikosti, 
+spočítáme $n = pq$ a $\phi(n) = (p-1)(q - 1)$. Výpočet veřejného exponentu $e$
+potom probíhá následovně. 
+%Nejprve se testuje, zda není možné použít některé
+%Fermatovo prvočíslo (3, 5, 17, 257, 65537), tj. pro každé z těchto čísel
+%se testuje, zda $\gcd(e,\phi(n)) = 1$. Pokud to některé Fermatovo prvočíslo
+%splňuje je vybráno právě to. V případě, kdy Fermatova prvočísla nelze využít, 
+%
+Postupně se generují náhodná celá čísla v intervalu $[2, \phi(n) - 1]$, dokud
+některé z nich nesplňuje podmínku $\gcd(e,\phi(n)) = 1$. GCD je implementováno
+pomocí Euklidova algoritmu (funkce \texttt{EuclideanAlgorithm}).
+
+Posledním krokem je generování soukromého exponentu $d$, který je spočítán jako
+$d = inv(e, \phi(n))$ a $inv$ je operace nalezení inverzního prvku (v programu funkce \texttt{Inverse}). Operace $inv$
+je implemenvoána pomocí rozšířeného Euklidova algoritmu, který hledá Bézoutovy 
+koeficienty (inverzní prvek vzhledem k modulu $\phi(n)$ je totiž jeden z Bézoutových 
+koeficientů). Veřejný klíč je potom dvojice $(e, n)$, soukromý klíč je dvojice $(d,n)$.
+
+\section{Šifrování a Dešifrování}
+Šifrování zadané zprávy (čísla) podle zadaného klíče je implementováno ve funkci \texttt{Cipher}, dešifrování
+ve funkci \texttt{Decipher}.
+Šifrování je prováděno podle vztahu \cite{nech}
+$$
+  c = m^e\quad (\mbox{mod } n)
+$$
+a dešifrování podle vztahu \cite{nech}
+$$
+  m = c^d\quad (\mbox{mod } n),
+$$
+kde $c$ je zašifrovaná zpráva (číslo) a $m$ je otevřená zpráva (číslo). Při implementaci
+byla opět využita vestavěná funkce \texttt{mpz\_powm} pro modulární umocňování.
+
+\section{Faktorizace}
+V této části se budeme zabývat zvolenými algoritmy a implementací faktorizace veřejného 
+modulu. Při faktorizaci se nejprve provede triviální (zkusmé) dělení prvních 1000000 čísel. V 
+implementaci je využito toho, že není třeba zkoušet složená čísla, stačí vyzkoušet
+všechna prvočísla menší než 1000000 (funkce \texttt{TrivialDivision}). Pro nalezení všech prvočísel menší než daná
+mez je využit Eratosthenovo síto. Použitím tohoto algoritmu jsem se vyhnul zkoušení čísel,
+které jistě být děliteli nemohou. Navíc dělení veřejného modulu je prováděno uvnitř cyklu
+Eratosthenova síta (hned jak se zjistí, že dané číslo je prvočíslo). Není tedy
+nutné nejprve nalezení a testování dělitelnosti provádět odděleně ve dvou cyklech.
+
+V případě, že není nalezen dělitel věřejného modulu pomocí zkusmého dělení, je využita sofistikovanější metoda.
+V programu je použit algoritmus Pollard $\rho$ s Brentovou detekcí cyklu (Brentova metoda) \cite{brent1}. Tento algoritmus
+je implementován ve funkci \texttt{BrentMethod}.
+Jak klasický algoritmus Pollard $\rho$ (s Floydovu detekcí cyklu), tak Brentova metoda využívají narozeninového paradoxu.
+Algoritmus využívá
+polynom $f$ pro generování pseudonáhodné posloupnosti $x_{n + 1} = f(x_n)$. Polynom je ve tvaru $f(x) = x^2 + c \mbox{ mod } n$
+(hodnota $c$ je v programu zvolena náhodně).
+
+Klasická verze Pollard $\rho$,
+která využívá Floydovu detekci cyklu postupně generuje hodnoty $x = f(x)$ a $y = f(f(y))$ dokud $x\neq y$.
+V případě, že $x = y$ byl nalezen cyklus a výpočet končí. V každé iteraci se rovněž spočítá $p = \gcd(|x - y|, n)$. 
+Pokud $p > 1$, byl nalezen dělitel veřejného modulu. Nicméně může se stát, že algoritmus nenajde
+dělitele i když $n$ je složené číslo. V tom případě je nutné změnit polynom $f$ a provést algoritmus znovu \cite{rho}.
+
+Brentova metoda vychází z klasického Pollard $\rho$ algoritmu, jen používá jinou detekci cyklu (Brentova detekce cyklu). 
+Brentova metoda mj. využívá faktu, že pokud $\gcd(x,n) > 1$ potom i $\gcd(ax,n)  > 1$, pro kladné celé číslo $a$.
+Místo počítání $\gcd(|x - y|, n)$ v každé iteraci, je tedy možné spočítat součin několika po sobě jdoucích
+$|x-y|$ a teprve potom hledat pro tento součin a $n$ největší společný dělitel, čímž dochází ke zrychlení celého
+algoritmu. Zápis algoritmu v pseudokódu je potom následující \cite{brent1, ref1}.
+
+\medskip
+\begin{algorithm}[H]
+ \SetKwInput{Input}{Input}\SetKwInOut{Output}{Output}
+ \SetNlSty{}{}{:}
+ \SetNlSkip{-1.2em}
+ \SetInd{1em}{1em}
+ \Input{Číslo $n$, které se má faktorizovat}
+ \Output{Dělitel $n$}
+ \BlankLine
+ \Indentp{1.7em}
+    Zvol náhodně hodnoty $y$, $c$ , $m$ z intervalu $[1, n-1]$, $f(x) = x^2 + c\mod n$. \\
+    $r\gets 1$, $q\gets 1$, $G\gets 1$ \\
+    \Do{$G = 1$} {
+      $x\gets y$ \\
+      \For{$i\gets 1$ $\mathbf{to}$ $r$} {
+	$y \gets f(y)$ \\
+      }
+      $k\gets 0$ \\
+      \While{$k < r$ $\mathbf{and}$ $G = 1$} {
+	$ys \gets y$ \\
+	\For{$i\gets 1$ to $\min(m, r-k)$} {
+	  $y \gets f(y)$ \\
+	  $q \gets q\cdot|x-y|\mod n $ \\
+	}
+	$G \gets \gcd(q,n)$ \\
+	$k \gets k + m$ \\
+      }
+      $r \gets 2r$ \\
+    }
+    \uIf{$G = n$} {
+      \Do{$G = 1$} {
+	$ys \gets f(ys)$ \\
+	$G \gets \gcd(|x-ys|,n)$ \\
+      }
+    }
+    \Return $G$
+ \caption{\textsc{Brentova metoda}}
+ \label{fastSlam}
+\end{algorithm}
+
+\medskip
+Pro výpočet $\gcd$ se využívá již zmíněná funkce \texttt{EuclideanAlgorithm}. Brentova metoda byla zvolena, protože klasická metoda Pollard $\rho$ faktorizovala některá čísla do délky 96 bitů
+mnohem déle než požadovaných 60 s.
+
+\section{Závěr}
+V rámci projektu se podařilo vytvořit program, který umožňuje generovat parametry RSA, přičemž pro
+testování prvočíselnosti byla zvolena metoda Solovay--Strassen. Dále program umožňuje šifrování
+a dešifrování zpráv (čísel) a také faktorizaci veřejného modulu. Faktorizace je implementována
+nejprve pomocí zkusmého dělení s využitím Eratosthenova síta. V případě neúspěchu je dále použita
+sofistikovanější Brentova metoda, která umožňuje faktorizovat v relativně krátkém čase veřejný 
+modulus do velikosti 96 bitů. 
+
+\bibliographystyle{czplain}
+\bibliography{literatura}{}
+
+\end{document}
