@@ -1,0 +1,10 @@
+<?php
+  
+function main() {      
+
+}
+ 
+$a = 8e5;
+$b = main();
+ 
+$b = null;

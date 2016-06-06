@@ -1,0 +1,9 @@
+<?php
+
+// Jenom main
+
+$a = "1.6000006E10";
+$s = doubleval($a);
+$x = put_string($s, "\n");
+$s = $s * 2;
+$x = put_string($s);

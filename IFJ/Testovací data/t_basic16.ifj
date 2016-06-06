@@ -1,0 +1,10 @@
+<?php
+
+$a = 5;
+$a = 10;
+
+if($a === 10) {
+  $x = put_string($a);
+} else {
+  $x = put_string($a);
+}

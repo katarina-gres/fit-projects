@@ -1,0 +1,13 @@
+<?php
+
+for($i = 0; $i < 7; $i = $i + 1) {
+	
+
+	for($j = 0; $j < 10; $j = $j + 1) {
+		$x = put_string($j);
+		continue;	
+	}
+
+if($i === 5) {break;}
+	else {$x=put_string($i, "\n");}
+}

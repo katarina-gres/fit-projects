@@ -1,0 +1,20 @@
+<?php
+
+for($i=0;$i<=10;$i=$i+1){
+  for($j=0;$j<=10;$j=$j+1){
+    $x=$j*$i;
+    $x=put_string($x,"\t");
+  }
+  $x=put_string("\n");
+}
+
+$a = "ahojd";
+if($a < "ahoj"){
+	$x=put_string($a, "\n");
+}
+else {
+	$x=put_string("ahoj", "nic\n");
+}
+
+$ret = get_string();
+$x=put_string($ret, "\n");
