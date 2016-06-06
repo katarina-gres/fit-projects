@@ -1,0 +1,83 @@
+\documentclass[a4paper,10pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+\usepackage[IL2]{fontenc}
+\usepackage{times}
+\usepackage{float}
+\usepackage[left=3cm,text={15cm, 23cm},top=3.5cm]{geometry}
+
+\begin{document}
+
+\noindent
+\textbf{Dokumentace úlohy JMP}: Jednoduchý makroprocesor v PHP 5 do IPP 2013/2014\\
+\textbf{Jméno a příjmení}: Vojtěch Havlena\\
+\textbf{Login}: xhavle03
+
+\section{Analýza řešení}
+Cílem zadané úlohy je implementace skriptu, který plní funkci jednoduchého makroprocesoru.
+Makroprocesor je mimo jiné schopen definovat a volat vlastní makra. Při řešení jsem 
+využil znalosti formálních jazyků (zejména konečných automatů).
+
+\section{Implementace}
+Celý program jsem logicky rozdělil do tří spolupracujících celků. První celek (\texttt{lex.php})
+zodpovídá za lexikální analýzu vstupního souboru, druhý celek (\texttt{semantic.php}) provádí expanzi maker
+a kontrolu syntaktické správnosti vstupního souboru. Poslední celek (\texttt{jmp.php}) kontroluje vstupní
+parametry a zodpovídá za správné volání funkcí z jednotlivých celků.
+
+První úkon, který program provádí je načítání a kontrola parametrů. Načítání je prováděno pomocí 
+funkce \texttt{getopt}. V této fázi je také zkontrolována případná neexistence 
+vstupního souboru či třeba chybné kódování vstupního souboru. Dále je provedena inicializace
+globálních proměnných (tabulka maker) a nakonec samotné zpracovávání vstupu.
+
+\subsection{Zpracovávání vstupu}
+Pro zpracovávání vstupu jsem se rozhodl implementovat jednoduchý lexikální analyzátor.
+Mezi rozpoznávané lexémy jsem zařadil znak, název makra, identifikátor proměnné a 
+závorky. Vzhledem k požadavkům úlohy nebylo možné rozpoznávání lexémů řešit pouze jediným
+univerzálním konečným automatem, ale bylo nutné implementovat dva kon. automaty, které 
+rozpoznávali lexémy v bloku a mimo blok. Během rozpoznávání je také prováděna náhrada
+escape sekvencí. 
+
+Čtení ze vstupu probíhá po jednotlivých znacích. Pokud je nutné 
+určitý text poslat opětovně na vstup pro znovuzpracování (rozgenerovávání maker),
+využívá se řetězce, ze kterého jsou jednotlivé znaky načítány prioritně. To znamená, že
+pokud je řetězec, kam je uložen znovuzpracovávaný text neprázdný, další znak bude 
+přečten právě z tohoto řetězce.
+
+\subsection{Definice a volání maker}
+Proces generování nového makra pomocí \texttt{@def} spočívá nejprve v načtení názvu a seznamu argumentů makra.
+V případě, že je program spuštěn v módu neumožňující redefinici maker, provede se kontrola, 
+zda makro není již uloženo v tabulce maker. Načtený seznam argumentů je uložen do tabulky maker.
+Dále je načteno samotné tělo makra, které je uloženo do tabulky maker. Před uložením
+se z celého těla odstraní výskyty argumentů, které se vyskytují i v načteném seznamu argumentů.
+Pro každý odstraněný argument se zapamatuje pozice, na kterých se nacházel pro pozdější
+volání maker se skutečnými parametry. 
+
+V případě definování nového makra pomocí maker s funkcí \texttt{@let} se nejprve
+načtou názvy obou maker (zdrojové a cílové makro). V dalším kroku se kontroluje existence
+zdrojového makra v tabulce maker a zda neredefinujeme makra, která nemohou být redefinována.
+Nakonec se podle cílového makra provede buď kopie záznamu v tabulce maker nebo se makro v 
+tabulce zruší.
+
+Proces volání makra spočívá nejprve v kontrole, zda je dané makro definováno. Následně je 
+provedeno načtení skutečných argumentů (počet argumentů je uložen v tabulce maker). Dále se 
+projde uložené tělo volaného makra znak po znaku a pro každou pozici se kontroluje, zda se 
+sem nemá vložit nějaký načtený argument. Po vložení načtených argumentů se zpracované tělo pošle 
+opět na vstup pro znovuzpracování lexikálním analyzátorem. Při volání makra, kterému byla přiřazena funkce
+vestavěného makra (například \texttt{@def}, \texttt{@set} apod.) se zavolají specializované funkce.
+
+\subsection{Tabulka maker}
+Tabulka maker je implementována jako asociativní pole, kde klíč je název makra a hodnota je instance
+třídy \texttt{TableItem}. Tato třída obsahuje informace o počtu parametrů, těle makra, seznamu jednotlivých
+parametrů a jejich umístění v těle makra. 
+
+Umístění argumentů je řešeno opět jako asociativní pole, kde klíč 
+odpovída pozici v těle a hodnota argumentu, který se má na danou pozici vložit. Dále třída obsahuje položku, 
+která nese informaci o tom, zda má makro přiřazenu funkci vestavěného makra (tato funkcionalita může být 
+přiřazena například makrem \texttt{@let}). 
+
+Na začátku programu je provedena inicializace tabulky maker vložením vestavěných maker.
+
+
+
+\end{document}
