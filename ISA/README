@@ -1,0 +1,13 @@
+Projekt do předmětu ISA: IRC bot s logováním přes SYSLOG
+Autor: Vojtěch Havlena, xhavle03
+
+IRC bot umožňuje logovat vybrané zprávy na daný server. Výběr
+příchozích zpráv pro logování je dán přítomností alespoň jednoho 
+slova ze seznamu klíčových slov.
+
+Příklad spuštění:
+./ircbot irc.nomi.cz "#fit" 127.0.0.1 "lan;wan;tcp;ip;isa"
+
+Seznam odevzdaných souborů:
+ircbot.cpp ircbot.h IrcParser.cpp IrcParser.h SyslogHandler.cpp 
+SyslogHandler.h Makefile README manual.pdf
