@@ -1,0 +1,284 @@
+\documentclass[a4paper,12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[czech]{babel}
+\usepackage[IL2]{fontenc}
+\usepackage[left=3cm,text={15cm, 23cm},top=3.5cm]{geometry}
+\usepackage{subcaption}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{array}
+\renewcommand{\arraystretch}{2}
+
+\usepackage{amsthm}
+
+\usepackage{color}
+\usepackage[ruled,czech,linesnumbered,noline]{algorithm2e}
+\usepackage{graphicx}
+\SetKwRepeat{Do}{do}{while}%
+
+\usepackage{tikz}
+\usetikzlibrary{patterns}
+
+\definecolor{grey}{rgb}{0.745098,0.745098,0.745098}
+
+\lstset{ %
+  basicstyle=\scriptsize
+}
+
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{tikz}
+
+\newtheorem{theorem}{Věta}
+\newtheorem{definition}{Definice}
+\newtheorem{example}{Příklad}
+
+\title{\bf Nashovo ekvilibrium s tolerancí}
+\author{Vojtěch Havlena, xhavle03\\ \texttt{xhavle03@stud.fit.vutbr.cz}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+  Vzhledem k výpočetní náročnosti hledání Nashových ekvilibrií v nekooperativních hrách, se nabízí otázka, 
+  jestli je možné hledat pouze přibližná řešení (Nashova ekvilibria).
+  Z tohoto důvodu byla zavedena Nashova ekvilibria s tolerancí (přibližná Nashova ekvilibria). Nashovo ekvilibrium s tolerancí je 
+  strategický profil, který přibližně splňuje podmínky kladené na Nashovo ekvilibrium. V této práci jsou
+  zkoumány dva přístupy k problematice Nashova ekvilibria s tolerancí\,--\,$\epsilon$-Nashovo ekvilibrium a
+  okrajově také $\epsilon$-well-supported Nashovo ekvilibrium. V práci je také ukázáno, jaký vliv má použití Nashových 
+  ekvilibrií s tolerancí na výpočetní složitost.
+\end{abstract}
+
+\section{Úvod}
+Pravděpodobně nejdůležitější koncept nekooperativních her\footnote{V této práci uvažuji implicitně pouze konečné hry.} je Nashovo ekvilibrium. Jedná se o strategický profil, při kterém 
+žádný hráč nemá důvod jednostranně změnit svoji strategii. Jinými slovy je to strategický profil, ve kterém žádný hráč 
+nezvýší svůj zisk tím, že by zvolil jinou strategii, zatímco ostatní hráči by si zachovali svoji stávající strategii.
+
+Ačkoliv již J. F. Nash dokázal, že každá konečná nekooperativní hra má řešení ve formě smíšeného Nashova ekvilibria\footnote{V dalším textu, pokud je řeč o Nashově ekvilibriu, myslím automaticky Nashovo ekvilibrium ve smíšených strategiích.}, 
+samotné hledání Nashova ekvilibria je obecně velmi obtížný problém (existence polynomiálního algoritmu je 
+otevřený problém). I~přesto existují algoritmy pro hledání Nashových ekvilibrií. Jedním
+z nejznámějších je Lemke-Howsonův algoritmus pro hledání NE ve dvouhráčových hrách v normální formě (bimatrix games). Bylo ale ukázáno, že časová složitost tohoto
+algoritmu je v nejhorším případě exponenciální vzhledem k počtu ryzích strategií hráčů~\cite{ECTA:ECTA667}. 
+
+Možný způsob, jak se vypořádat se zmíněnou výpočetní složitostí, je hledat přibližná NE (tedy NE s určitou tolerancí). 
+Jedním z konceptů přibližných Nashových ekvilibrií je $\epsilon$-Nashovo ekvilibrium.
+Neformálně, smíšený profil je $\epsilon$-NE pokud žádný hráč nemůže zvýšit svůj očekávaný zisk o více než 
+$\epsilon$ v případě, že by jednostranně změnil svoji strategii.
+
+Formálněji, uvažujme konečnou nekooperativní hru $n$ hráčů v normální formě $\Gamma = (Q, \{S_i\}_{i\in Q}, \{U_i\}_{i\in Q})$ a její smíšené rozšíření
+$\Gamma^m = (Q, \{\Delta_i\}_{i\in Q}, \{\pi_i\}_{i\in Q})$. Potom můžeme $\epsilon$-NE definovat následovně\footnote{Uvedená definice je pro 
+smíšené $\epsilon$-Nashovo ekvilibrium, které je v této práci uvažováno implicitně. Velice podobným způsobem je možné 
+definovat $\epsilon$-Nashovo ekvilibrium v ryzích strategiích.}.
+
+\begin{definition}[\cite{Leyton-Brown:2008:EGT:1481632}]
+  Mějme $\epsilon > 0$. Smíšený strategický profil $\sigma \in\Delta$ je $\epsilon$-Nashovo ekvilibrium ve hře $\Gamma$, pokud
+  pro všechny $i\in Q$ a $\sigma_i'\in\Delta_i$ platí $\pi_i(\sigma) \geq \pi_i(\sigma_i', \sigma_{-i}) - \epsilon$.
+\end{definition}
+
+\emph{Pozn. V této práci se snažím co nejvíce využít notaci použitou na přednáškách (někdy se liší od notace, která se využívá v jednotlivých článcích).}
+Pokud bychom v definici povolili $\epsilon = 0$, tak dostáváme definici Nashova ekvilibria. Každé Nashovo ekvilibrium je tedy i 
+$\epsilon$-NE. Vzhledem k tomu, že pro každou konečnou nekooperativní hru
+existuje Nashovo ekvilibrium, existuje i $\epsilon$-NE. Každé NE je aproximováno $\epsilon$-Nashovými ekvilibrii. 
+Při výpočtu Nashových ekvilibrií na počítači je použití $\epsilon$-NE poměrně přirozené. Díky tomu, že reálná čísla jsou reprezentována
+pouze s omezenou přesností, i algoritmy pro hledání Nashových ekvilibrií hledají ve skutečnosti $\epsilon$-Nashova 
+ekvilibria pro hodnotu $\epsilon$, které odpovídá přesnosti práci s reálnými čísly~\cite{Leyton-Brown:2008:EGT:1481632}.
+
+\begin{figure}[h]
+  \catcode`\-=12
+  \centering
+  \begin{tabular}{ c | c | c | }
+  \multicolumn{1}{c}{} & \multicolumn{1}{c}{$L$} & \multicolumn{1}{c}{$R$} \\\cline{2-3}
+  $U$ & 1,1 & 0,0 \\\cline{2-3}
+  $D$ & 1+$\frac{\epsilon}{2}$, 1 & 500,500 \\\cline{2-3}
+\end{tabular}
+\caption{Hra v příkladu 1.}
+\label{fig:game}
+\end{figure}
+
+
+\begin{example}[\cite{Leyton-Brown:2008:EGT:1481632}]\label{ex:1}
+  Uvažujme hru na obr.~\ref{fig:game} pro $\epsilon > 0$. Zde vidíme, že pro řádkového hráče jeho strategie $D$ striktně dominuje nad jeho strategií $U$. Po odstranění
+  strikně dominované strategie $U$, strategie $R$ sloupcového hráče strikně dominuje nad jeho strategií $L$. Iterativním odstraňováním
+  strikně dominovaných strategií jsme tedy zjistili, že hra má jediné Nashovo ekvilibrium $(D,R)$. Tento profil je rovněž
+  $\epsilon$-NE. Nicméně v této hře je také profil $(U, L)$ $\epsilon$-NE, protože žádný hráč si změnou strategie nepolepší o více než 
+  $\epsilon$ (řádkový hráč by si polepšil jen o hodnotu $\epsilon/2$).
+\end{example}
+
+I když každé Nashovo ekvilibrium je \uv{obklopeno} $\epsilon$-Nashovými ekvilibrii, tak ne každé $\epsilon$-Nashovo 
+ekvilibrium je, co se týče očekávaného užitku, \uv{blízko} očekávaného užitku NE (viz profil $(U, L)$ ve hře z příkladu~\ref{ex:1}).
+
+Na závěr ještě uvedeme další z konceptů přibližných Nashových ekvilibrií, $\epsilon$-well-supported Nashovo ekvilibrium.
+Hlavní myšlenka je, že $\epsilon$-well-supported Nashovo ekvilibrium je takový smíšený profil, ve kterém každý hráč přiřazuje nenulovou 
+pravděpodobnost těm ryzím strategiím, jejichž očekávaný zisk při hraní této ryzí strategie je nejvýše $\epsilon$ od očekávaného zisku při hraní ryzí best response na smíšené strategie ostatních hráčů.
+
+\begin{definition}[\cite{Daskalakis}]
+  Mějme $\epsilon > 0$. Smíšený strategický profil $\sigma \in\Delta$ je $\epsilon$-well-supported Nashovo ekvilibrium ve hře $\Gamma$, pokud
+  pro všechny $i\in Q$ a $s_i, s_i'\in S_i$ takové, že $\sigma_i(s_i) > 0$, platí $\pi_i(s_i, \sigma_{-i}) \geq \pi_i(s_i', \sigma_{-i}) - \epsilon$.
+\end{definition}
+
+\emph{Pozn.  Existuje více formulací definice $\epsilon$-well-supported Nashova ekvilibria (např. jako je uvedeno v~\cite{dp}).}
+
+Jak bylo již zmíněno na začátku kapitoly, výpočet Nashových ekvilibrií je náročný algoritmický problém, proto byla zavedena přibližná 
+Nashova ekvilibria. V dalších kapitolách se proto budeme
+věnovat algoritmům pro výpočet $\epsilon$-NE a budeme rovněž zkoumat vliv na algoritmickou složitost.
+
+\section{Algoritmus pro výpočet $\epsilon$-Nashova ekvilibria}
+V této části se blíže podíváme na algoritmus pro výpočet $\epsilon$-Nashova ekvilibria ve dvouhráčové nekooperativní hře. Tato kapitola je založena na 
+článku~\cite{Lipton:2003:PLG:779928.779933} a zaměřuji se zde na hlavní myšlenku (podrobné matematické důkazy jsou k dispozici ve zmíněném článku).
+
+Kromě pojmů popsaných v předchozích kapitolách, je pro další výklad navíc nutné zavést pojem \emph{k-uniformní} smíšená strategie. 
+Uvažujme multimnožinu\footnote{může obsahovat několikrát stejnou ryzí strategii} ryzích strategií $S_i'$ hráče $i\in Q$. Smíšená strategie $\sigma_i$ 
+hráče $i \in Q$ je potom nazývána \emph{k-uniformní} strategie, pokud $\sigma_i$ je uniformní rozložení pravděpodobnosti na nějaké multimnožině $S_i'$, kde 
+$|S_i'| = k$. To znamená, že pokud si pro libovolnou ryzí strategii $s_i \in S_i$ označíme $\alpha_{s_i}$ jako počet výskytů strategie $s_i$ v multimnožině $S_i'$, potom 
+$\sigma_i(s_i) = \frac{\alpha_{s_i}}{k}$ (všechny hodnoty vektoru $\sigma_i$ jsou tedy násobky $1/k$).
+
+Předtím, než se budeme věnovat samotnému algoritmu, uvedeme větu, která stojí za celým algoritmem. Uvažujme tedy dále konečnou dvouhráčovou nekooperativní hru v normální formě 
+$\Gamma = (Q;S_1,S_2;U_1, U_2)$ a její smíšené rozšíření $\Gamma^m$. Pro jednoduchost zatím uvažujeme, že $|S_1| = |S_2| = n$. Díky strategické ekvivalenci her můžeme 
+navíc předpokládat, že hodnoty užitků pro libovolného hráče a libovolnou ryzí strategii, 
+jsou v rozmezí 0 -- 1 (dále je taková hra označována jako normalizovaná). Potom platí následující věta.
+
+\begin{theorem}[\cite{Lipton:2003:PLG:779928.779933}]\label{the:eps}
+ Pro každé Nashovo ekvilibrium $(\sigma_1^*, \sigma_2^*)$ a pro každé reálné číslo $\epsilon > 0$, existuje pro každé $k \geq \frac{12\ln n}{\epsilon ^2}$
+ dvojice $k$-uniformních strategií $\sigma_1'$, $\sigma_2'$ takových, že: 
+ \begin{enumerate}
+    \item $(\sigma_1', \sigma_2')$ je $\epsilon$-Nashovo ekvilibrium,
+    \item $|\pi_1(\sigma_1', \sigma_2') -\pi_1(\sigma_1^*, \sigma_2^*) | < \epsilon$ a $|\pi_2(\sigma_1', \sigma_2') -\pi_2(\sigma_1^*, \sigma_2^*) | < \epsilon$.
+ \end{enumerate}
+\end{theorem}
+
+Nyní již k samotnému algoritmu, který najde všechna $k$-uniformní $\epsilon$-Nashova ekvilibria ve hře $\Gamma$ a je založen na předchozí větě. Mějme danou hodnotu $\epsilon > 0$. Vstupem algoritmu 
+je potom normalizovaná hra $\Gamma$. V prvním kroce nastavíme hodnotu $k = \frac{12\ln n}{\epsilon ^2}$. Dále budeme postupně iterovat přes všechny dvojice $k$-uniformních strategií. Hledání
+všech $k$-uniformních strategií hráče $i$ odpovídá vytváření všech možných $k$ prvkových multimnožin z jeho množiny strategií $S_i$. Ke každé nalezené multimnožině přísluší 
+$k$-uniformní strategie (viz. definice). Všechny $k$ prvkové multimnožiny nalezneme poměrně jednoduše hrubou silou. Pro každou dvojici 
+$k$-uniformních strategií se provede ověření, zda se opravdu jedná o $\epsilon$-Nashovo ekvilibrium. Pro ověření, zda se jedná o $\epsilon$-NE stačí, 
+stejně jako v případě smíšeného Nashova ekvilibria, zkoumat jen ty situace, kdy se hráč z profilu \uv{odkloní} ke hře nějaké své ryzí strategie (resp. smíšené strategie, která 
+má na pozici $j\in\{1,\dots,n\}$ hodnotu 1). 
+
+Co se týče časové složitosti algoritmu, tak počet $k$ prvkových multimnožin odpovídá počtu kombinací $k$-té třídy z $n$ prvků s opakováním. Pokud si
+počet $k$ prvkových multimnožin (resp. počet všech $k$-uniformních strategií) označíme pomocí $P$, tak platí
+\begin{equation}
+  P = \binom{n+k-1}{k} \sim n^k.
+\end{equation}
+Vzhledem k tomu, že hledáme dvojice $k$-uniformních strategií, tak máme celkem až $n^{2k}$ možností. Celková asymptotická složitost tedy je 
+\begin{equation}
+  n^{\mathcal{O}(k)} = n^{\mathcal{O}(\frac{\ln n}{\epsilon^2})}.
+\end{equation}
+Ověření, zda dvojice $k$-uniformních strategií tvoří $\epsilon$-NE,
+se na celkové asymptotické složitosti neprojevý.
+Tato složitost se nazývá kvazi-polynomiální.
+
+Věta~\ref{the:eps} nám také říká, že pro každé Nashovo ekvilibrium $\sigma^*$ existuje $k$-uniformní $\epsilon$-NE takové, že očekávaný užitek 
+při tomto $\epsilon$-NE pro každého hráče se od očekávaného užitku NE $\sigma^*$ liší nejvýše o $\epsilon$. Výše uvedený algoritmus je 
+tedy možné upravit tak, aby pro zadané Nashovo ekvilibrium našel $\epsilon$-NE při kterém se očekávaný užitek obou hráčů liší od oč. 
+užitku zadaného NE nejvýše o $\epsilon$ (modifikace by spočívala v přidání omezující podmínky na nalezená $\epsilon$-NE).
+
+Zatím jsme uvažovali, že pro množiny ryzích strategií platí $|S_1| = |S_2| = n$. V případě, že hráči mají různé počty ryzích strategií 
+($n_1 = |S_1|$ a $n_2 = |S_2|$), platí výše uvedená věta, jen se změnou podmínky kladené na hodnotu $k$:
+\begin{equation}
+  k \geq \frac{12\ln \max\{n_1, n_2\}}{\epsilon^2}.
+\end{equation}
+Algoritmus pro rozdílné počty ryzích strategií zůstává stejný. Asymptotická složitost by zůstala rovněž stejná při uvažování $n = \max\{n_1, n_2\}$.
+
+
+\section{Hledání přibližných Nashových ekvilibrií pro\\ konstantní $\epsilon$}
+V předchozí kapitole jsme se zabývali algoritmem, který pro danou hodnotu $\epsilon$ a nekooperativní normalizovanou dvouhráčovou hru v normální formě $\Gamma$ najde 
+$k$-uniformní $\epsilon$-Nashova ekvilibria. Tento algoritmus má kvazi-polynomiální časovou složitost. V této kapitole se
+na celou situaci podíváme z trochu jiného pohledu. Budeme se opět zabývat pouze dvouhráčovými nekooperativními normalizovanými hrami v normální formě.
+Bude nás ale zajímat existence algoritmů, které v polynomiálním čase naleznou $\epsilon$-Nashovo ekvilibrium pro nějakou pevnou hodnotu $\epsilon$.
+
+\subsection{Výpočet $\frac{1}{2}$-Nashova ekvilibria}
+Tato podkapitola je založena na článku~\cite{DASKALAKIS20091581}.
+V této podkapitole předpokládáme dvohráčovou nekooperativní normalizovanou hru v normální formě, kde každý hráč má $n$ strategií a zisky jsou zadány ve formě matic 
+rozměru $n\times n$ (matice $R$ pro řádkového hráče a $C$ pro sloupcového). Ryzí strategie řádkového hráče odpovídají $n$ řádkům matice
+a ryzí strategie sloupcového odpovídají $n$ sloupcům matice. Očekávaný zisk řádkového hráče při hraní smíšeného strategického profilu $(x,y)$
+je potom tedy $x^\top Ry$ a podobně očekávaný zisk sloupcového je $x^\top Cy$.
+
+Jak již bylo zmíněno dříve, při ověřování, zda se jedná o Nashovo ekvilibrium (resp. $\epsilon$-NE), stačí kontrolovat zisk jednotlivých hráčů když se 
+jednostranně odchýlí k hraní nějaké své ryzí strategie
+\footnote{Pro zadanou smíšenou strategii $y^*$ sloupcového hráče je výraz $x(Ry^*)$ v podstatě váženým průměrem hodnot vektoru $Ry^*$ podle smíšené 
+strategie $x$. A tedy výraz nabývá maxima pro $x$, které odpovídá nějaké ryzí strategii řádkového hráče (vektor má na určité pozici 1, na ostatních 0). Podobně pro hráče sloupcového.}.
+Pojem $\epsilon$-Nashova ekvilibria tedy můžeme ekvivalentně, při použití předchozí notace definovat také následovně. Smíšený profil $(x^*,y^*)$
+je $\epsilon$-Nashovo ekvilibrium pro $\epsilon > 0$ ve dvouhráčové nekooperativní hře v normální formě s maticemi zisků $R,C$, pokud platí~\cite{DASKALAKIS20091581}:
+\begin{eqnarray}
+  \label{eq:eps1}\forall i = 1,\dots,n:\quad e_i^\top Ry^* &\leq& x^{*\top}Ry^* + \epsilon \\
+  \label{eq:eps2}\forall i = 1,\dots,n:\quad x^{*\top} Ce_i &\leq& x^{*\top}Cy^* + \epsilon,
+\end{eqnarray}
+kde $e_i$ ve vektor, jehož $i$-tý prvek je 1 ostatní prvky jsou nastaveny na 0 (odpovídá hraní ryzí strategie $i$).
+Algoritmus, který pro dvouhráčovou hru, danou maticemi zisků $R$ a $S$ najde $\frac{1}{2}$-Nashovo ekvilibrium je dán následovně~\cite{DASKALAKIS20091581}.
+\begin{enumerate}
+ \item Zvol libovolný řádek $i$ pro řádkového hráče (vzhledem k tomu, že ryzí strategie odpovídají řádkům/sloupcům matice, nerozlišuji mezi pojmem strategie a řádek/sloupec).
+ \item Nechť $j \in \arg\max_{j'}C_{ij'}$ -- $j$ je tedy strategie sloupcového hráče (sloupec matice), která je best response na strategii (řádek) $i$ řádkového hráče.
+ \item Nechť $k \in \arg\max_{k'}R_{k'j}$ -- $k$ je tedy strategie řádkového hráče (řádek matice), která je  je best response na strategii (sloupec) $j$ sloupcového hráče
+ \item Ekvilibrium je $(x^*, y^*)$, kde $x^* = \frac{1}{2}e_i + \frac{1}{2}e_k$ a $y^* = e_j$.
+\end{enumerate}
+Algoritmus pracuje s lineární časovou složitostí (vzhledem k počtu ryzích strategií) -- hledá se jen maximum na řádku a sloupci matice.
+
+Zbývá dokázat, že smíšený profil $(x^*, y^*)$ je opravdu $\frac{1}{2}$-Nashovo ekvilibrium. Očekávaný zisk řádkového hráče 
+při hraní $(x^*, y^*)$ je
+\begin{eqnarray}
+  \pi_1(x^*, y^*) &=& x^{*\top}Ry^* = \left(\frac{1}{2}e_i + \frac{1}{2}e_k\right)^\top Re_j = \left(\frac{1}{2}e_i^\top + \frac{1}{2}e_k^\top\right) Re_j \\ &=& 
+  \frac{1}{2}e_i^\top Re_j + \frac{1}{2}e_k^\top Re_j = \frac{1}{2}R_{ij} + \frac{1}{2}R_{kj}.
+\end{eqnarray}
+Dále z 3. kroku algoritmu víme, že jedno z best response řádkového hráče na strategii $y^*$ je hrát řádek (strategii) $k$. Očekávaný zisk
+řádkového hráče při hraní tohoto profilu je $\pi_1(e_k, y^*) = \pi_1(e_k, e_j) = R_{kj}$. Vzhledem k tomu, že $k$ je best response
+na $y^*$, řádkový hráč nezíská více při hraní jiné ryzí strategie. Platí tedy
+\begin{eqnarray}
+  \pi_1(e_k, y^*) - \pi_1(x^*, y^*) = R_{kj} - \left(\frac{1}{2}R_{ij} + \frac{1}{2}R_{kj}\right) = \frac{1}{2}R_{kj} - \frac{1}{2}R_{ij}.
+\end{eqnarray}
+Vzhledem k tomu, že hra je normalizovaná, předchozí výraz nabývá maxima v případě, kdy $R_{ij} = 0$ a $R_{kj} = 1$. Dále tedy dostáváme
+\begin{eqnarray}
+  \pi_1(e_k, y^*) - \pi_1(x^*, y^*) \leq \frac{1}{2}R_{kj} \leq \frac{1}{2}.
+\end{eqnarray}
+První podmínka \eqref{eq:eps1} z definice $\epsilon$-NE je tedy splněna. Nyní budeme dokazovat druhou podmínku.
+Zisk sloupcového hráče při hraní $(x^*, y^*)$ je
+\begin{equation}
+  \pi_2(x^*, y^*) = x^{*\top}Cy^* = \frac{1}{2}C_{ij} + \frac{1}{2}C_{kj}.
+\end{equation}
+Dále nechť $j'$ je ryzí best response sloupcového hráče na smíšenou strategii $x^*$. Zisk sloupcového hráč při hraní tohoto
+smíšeného profilu potom je 
+\begin{equation}
+  \pi_2(x^*, e_{j'}) = \frac{1}{2}C_{ij'} + \frac{1}{2}C_{kj'}.
+\end{equation}
+Podobně jako v předchozím případě spočítáme rozdíl očekávaného zisku $\pi_2(x^*, e_{j'})$ od $\pi_2(x^*, y^*)$. Dostáváme tedy
+\begin{eqnarray}
+  \pi_2(x^*, e_{j'}) - \pi_2(x^*, y^*) &=& \left(\frac{1}{2}C_{ij'} + \frac{1}{2}C_{kj'}\right) - \left(\frac{1}{2}C_{ij} + \frac{1}{2}C_{kj}\right) \\
+  &=&\frac{1}{2}\left(C_{ij'} - C_{ij}\right) + \frac{1}{2}\left(C_{kj'}-C_{kj}\right).
+\end{eqnarray}
+Díky tomu, že $j$ je best response sloupcového hráče na strategii $i$, platí $C_{ij} \geq C_{ij'}$. Opět se snažíme výraz omezit
+zhora (což je tedy případ, kdy $C_{ij} = C_{ij'}$) a konečně dostáváme
+\begin{equation}
+  \pi_2(x^*, e_{j'}) - \pi_2(x^*, y^*) \leq 0 +  \frac{1}{2}(C_{kj'}-C_{kj}) \leq \frac{1}{2}.
+\end{equation}
+Druhá podmínka \eqref{eq:eps2} z definice $\epsilon$-NE je tedy rovněž splněna. Smíšený profil $(x^*, y^*)$ je tedy $\frac{1}{2}$-NE.
+
+
+\subsection{Přehled známých výsledků}
+V předchozí podkapitole jsme ukázali jednoduchý polynomiální algoritmus pro výpočet $\frac{1}{2}$-NE.
+Nicméně existují polynomiální algoritmy, které naleznou přibližná Nashova ekvilibria pro ještě menší hodnoty $\epsilon$. V literatuře se mi podařilo nalézt tyto 
+výs\-ledky. V případě $\epsilon$-Nashova ekvilibria existuje pro dvouhráčové nekooperativní normalizované hry
+v normální formě polynomiální algoritmus, který nalezne $0.3393$-NE~\cite{Tsaknakis2007}. V případě $\epsilon$-well-supported Nashova ekvilibria existuje pro dvouhráčové nekooperativní normalizované hry
+v normální formě polynomiální algoritmus, který nalezne $\frac{2}{3}$-WSNE~\cite{Kontogiannis:2010:WSA:1773434.1773437} (modifikovaná 
+verze algoritmu dokonce umožňuje nalézt $(\frac{2}{3} - 0.005913759)$-WSNE~\cite{DBLP:journals/corr/abs-1204-0707}).
+
+
+\section{Závěr}
+V této práci jsem se věnoval problematice Nashova ekvilibria s tolerancí (přibližného Nashova ekvilibria). Zaměřil jsem se hlavně na $\epsilon$-Nashovo ekvilibrium, 
+okrajově také na $\epsilon$-well-supported Nashovo ekvilibrium. Tato práce je založena na několika článcích, přičemž jsem se v nich zaměřil převážně na hlavní části
+a samotné výsledky. Podrobnější informace včetně důkazů lze najít v originálních článcích. 
+
+První část práce byla věnována základním definicím. Ve druhé části byl popsán algoritmus včetně odvození složitosti algoritmu pro výpočet $\epsilon$-NE v 
+normalizovaných dvouhráčových nekooperativních hrách v normální formě. Třetí část byla potom věnována otázce pro jaké hodnoty $\epsilon$ existuje 
+polynomiální algoritmus, který nalezne $\epsilon$-NE, resp. $\epsilon$-WSNE.
+Na závěr poznamenejme, že kromě zmíněných algoritmů, je možné pro výpočet $\epsilon$-NE použít například i evoluční algoritmy~\cite{Boryczka2013}.
+
+Ačkoliv má použití $\epsilon$-NE i nevýhody, které byly zmíněny v úvodní kapitole, má použití $\epsilon$-NE pozitivní vliv na výpočetní 
+složitost, ve srovnání s výpočtem NE. Nicméně i přes všechny dosažené výsledky zůstávají stále některé problémy otevřeny, např. existence
+polynomiálního algoritmu pro výpočet $\epsilon$-NE, pro libovolné hodnoty~$\epsilon$~\cite{Nisan:2007:AGT:1296179}.
+
+\bibliographystyle{czplain}
+\bibliography{literatura}{}
+
+\end{document}
